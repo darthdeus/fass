@@ -1,5 +1,40 @@
 module Main where
 
+-- import Text.Parsec
+import Text.ParserCombinators.Parsec
+
+symbol :: Parser Char
+symbol = oneOf "!#$%&|*+-/:<=>?@^_~"
+
+eol :: GenParser Char st Char
+eol = char '\n'
+
+parseRuleset = do
+    selector <- parseSelector
+    many space
+    char '{'
+    rules <- many parseRule
+    char '}'
+    return $ Ruleset selector rules
+
+parseSelector = many letter
+
+parseRule :: Parser Rule
+parseRule = do
+    many space
+    property <- many1 $ letter <|> char '-'
+    many space
+    char ':'
+    many space
+    value <- many1 letter
+    optional $ char ';'
+    optional eol
+    return $ Declaration property value
+
+main = do
+    text <- readFile "sample.scss"
+    print $ parse parseRuleset "le parser" text
+
 type Document = [Ruleset]
 
 data Ruleset = Ruleset Selector [Rule]
@@ -13,5 +48,3 @@ data Rule = Declaration Property Value
           deriving (Show)
           -- | Variable Name Value
 
-
-main = putStrLn "FASS IS HERE"
