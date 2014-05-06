@@ -15,6 +15,7 @@ parseRuleset = do
     char '{'
     rules <- many parseRule
     char '}'
+    many eol
     return $ Ruleset selector rules
 
 parseSelector = many letter
@@ -28,12 +29,12 @@ parseRule = do
     many space
     value <- many1 letter
     optional $ char ';'
-    optional eol
+    many eol
     return $ Declaration property value
 
 main = do
     text <- readFile "sample.scss"
-    print $ parse parseRuleset "le parser" text
+    print $ parse (many parseRuleset) "le parser" text
 
 type Document = [Ruleset]
 
