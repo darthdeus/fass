@@ -15,7 +15,8 @@ expandSelector :: String -> Entity -> Entity
 expandSelector prefix v@(Variable _ _) = v
 expandSelector prefix r@(Rule _ _) = r
 expandSelector prefix (Ruleset s inner) = Ruleset newPrefix (expandSelectorWithPrefix newPrefix inner)
-                 where newPrefix = s ++ " " ++ prefix
+                                        where newPrefix = s ++ " " ++ prefix
+
 
 unwrap :: Entity -> [Entity]
 unwrap v@(Variable _ _) = [v]
