@@ -2,19 +2,10 @@ module Fass.Parser
   (parseSCSS)
 where
 
+import Fass.Types
+
 -- import Text.Parsec
 import Text.ParserCombinators.Parsec
-
-type Document = [Entity]
-
-type Selector = String
-type Property = String
-type Value = String
-
-data Entity = Ruleset Selector [Entity]
-            | Variable String String
-            | Rule Property Value
-            deriving (Show)
 
 eol :: GenParser Char st Char
 eol = char '\n'
