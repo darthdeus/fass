@@ -16,4 +16,3 @@ data Entity = Ruleset Selector [Entity]
             | Variable String String
             | Rule Property Value
             deriving (Show)
-

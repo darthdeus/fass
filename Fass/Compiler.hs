@@ -1,9 +1,9 @@
 module Fass.Compiler
   ( flatten
-  , expandSelector)
+  , expandSelector )
   where
 
-import Fass.Types
+import           Fass.Types
 
 flatten :: [Entity] -> [Entity]
 flatten xs = concatMap unwrap $ expandSelectorWithPrefix "" xs
@@ -25,4 +25,3 @@ unwrap r@(Ruleset _ inner) = r : filter isRuleset inner
 isRuleset :: Entity -> Bool
 isRuleset (Ruleset _ _) = True
 isRuleset _             = False
-
