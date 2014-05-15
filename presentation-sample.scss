@@ -1,0 +1,18 @@
+@import "sample";
+
+$blue: red;
+
+@mixin beautiful($color) { color: darken($color, 30%); }
+
+p {
+  color: $blue;
+  @import "sample";
+
+  $blue: green;
+  span {
+    @include beautiful($blue);
+    & {
+      font-size: darken($blue, 20%);
+    }
+  }
+}

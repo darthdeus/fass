@@ -1,9 +1,12 @@
+$red: blue;
+
 p {
-  color: red;
+  color: $red;
   font-weight: bold;
+
+  span {
+    color: red;
+    font-weight: bold;
+  }
 }
 
-span {
-  color: red;
-  font-weight: bold;
-}

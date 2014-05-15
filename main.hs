@@ -3,49 +3,66 @@ module Main where
 -- import Text.Parsec
 import Text.ParserCombinators.Parsec
 
-symbol :: Parser Char
-symbol = oneOf "!#$%&|*+-/:<=>?@^_~"
-
 eol :: GenParser Char st Char
 eol = char '\n'
 
+parseEntity :: Parser Entity
+parseEntity = do
+    value <- try parseRuleset <|> try parseRule <|> parseVariable
+    many space
+    return value
+
+parseRuleset :: Parser Entity
 parseRuleset = do
     selector <- parseSelector
     many space
     char '{'
-    rules <- many parseRule
+    many space
+    entities <- many parseEntity
+    many space
     char '}'
-    many eol
-    return $ Ruleset selector rules
+    return $ Ruleset selector entities
 
-parseSelector = many letter
-
-parseRule :: Parser Rule
+parseRule :: Parser Entity
 parseRule = do
     many space
     property <- many1 $ letter <|> char '-'
     many space
     char ':'
     many space
-    value <- many1 letter
+    value <- many1 $ letter <|> char '$' <|> char '#'
     optional $ char ';'
-    many eol
-    return $ Declaration property value
+    return $ Rule property value
+
+parseSelector :: Parser Selector
+parseSelector = do
+    many space
+    many letter
+
+parseVariable :: Parser Entity
+parseVariable = do
+    char '$'
+    name <- many1 $ letter <|> char '-'
+    many $ char ' '
+    char ':'
+    many $ char ' '
+    value <- many1 $ char '#' <|> letter <|> char '-'
+    optional $ char ';'
+    return $ Variable name value
 
 main = do
     text <- readFile "sample.scss"
-    print $ parse (many parseRuleset) "le parser" text
+    print $ parse (many parseEntity) "le parser" text
 
-type Document = [Ruleset]
+t = parse parseRuleset "some parser"
 
-data Ruleset = Ruleset Selector [Rule]
-             deriving (Show)
+type Document = [Entity]
 
 type Selector = String
 type Property = String
 type Value = String
 
-data Rule = Declaration Property Value
-          deriving (Show)
-          -- | Variable Name Value
-
+data Entity = Ruleset Selector [Entity]
+            | Variable String String
+            | Rule Property Value
+            deriving (Show)
