@@ -6,7 +6,7 @@ module Fass.Compiler
 import           Fass.Types
 
 flatten :: [Entity] -> [Entity]
-flatten xs = flattenPrefix "" xs
+flatten = flattenPrefix ""
 
 flattenPrefix :: String -> [Entity] -> [Entity]
 flattenPrefix prefix xs = concatMap unwrap $ expandSelectorWithPrefix prefix xs
@@ -18,8 +18,8 @@ expandEntity :: String -> Entity -> [Entity]
 expandEntity _ v@(Variable _ _) = [v]
 expandEntity _ r@(Rule _ _) = [r]
 expandEntity prefix (Ruleset s inner) = first : rest
-    where first = Ruleset newPrefix (filter (not . isRuleset) inner)
-          rest = flattenPrefix newPrefix (filter isRuleset inner)
+    where first     = Ruleset newPrefix (filter (not . isRuleset) inner)
+          rest      = flattenPrefix newPrefix (filter isRuleset inner)
           newPrefix = s ++ " " ++ prefix
 
 unwrap :: Entity -> [Entity]
