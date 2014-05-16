@@ -12,7 +12,7 @@ eol = char '\n'
 
 parseEntity :: Parser Entity
 parseEntity = do
-    value <- try parseRuleset <|> try parseRule <|> parseVariable
+    value <- try parseVariable <|> try parseRule <|> parseRuleset
     many space
     return value
 
