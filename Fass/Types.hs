@@ -16,3 +16,8 @@ data Entity = Ruleset Selector [Entity]
             | Variable String String
             | Rule Property Value
             deriving (Show)
+
+newtype CSSDocument = CSSDocument [CSSEntity]
+
+data CSSEntity = CSSImport String
+               | CSSRuleset String
