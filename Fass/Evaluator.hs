@@ -1,4 +1,4 @@
-module Evaluator where
+module Fass.Evaluator where
 
 data SASSEntity = SASSImport String
                 | SASSVariable String String
