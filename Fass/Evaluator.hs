@@ -1,53 +1,57 @@
 module Fass.Evaluator where
 
-import qualified Data.Map as M
+import           Control.Monad.State
+import qualified Data.Map            as M
+import Data.Maybe
 
-data SASSEntity = SASSImport String
-                | SASSVariable Binding
-                | SASSToplevelRuleset SASSRuleset
-                  deriving (Show)
+data SASSRuleset = SASSRuleset [SASSEntity]
+                   deriving Show
 
-data CSSEntity = CSSImport String
-               | CSSRuleset Selector [CSSRule]
-               | CSSNoValue String
-                 deriving (Show)
+data SASSEntity = SASSVariable String String
+                | SASSRule String String
+                | SASSNothing
+                  deriving Show
 
-type Selector = String
-type CSSRule = [String]
-newtype CSSDocument = CSSDocument [CSSEntity]
-
-newtype SASSDocument = SASSDocument [SASSEntity]
-data SASSRuleset = SASSRuleset [String] deriving (Show)
-
-type SASSEnv = [Binding]
-type Bindings = M.Map String String
+type SASSEnv = M.Map String String
 
 emptyEnv :: SASSEnv
-emptyEnv = []
+emptyEnv = M.empty
 
-compile :: SASSDocument -> CSSDocument
-compile SASSDocument [] = []
-compile SASSDocument (x:xs) =
-    runReader emptyEnv $ do
-      case x of
-        SASSImport s -> s
-        SASSVariable (name, value) -> ask >>= local (M.insert name value)
+compile :: SASSRuleset -> State SASSEnv SASSRuleset
+compile (SASSRuleset []) = return $ SASSRuleset []
+compile (SASSRuleset [x]) = compileEntity x >>= return . SASSRuleset . (:[])
+compile (SASSRuleset (x:y:_)) = do
+  cx <- compileEntity x
+  cy <- compileEntity y
+  return $ SASSRuleset [cx, cy]
+
+test :: [SASSEntity]
+test = case flip evalState emptyEnv $ compile $ SASSRuleset [SASSVariable "olaf" "#fafafa", SASSRule "color" "$olaf"] of
+  SASSRuleset results -> filter x results
+    where x SASSNothing = False
+          x _ = True
+
+compileEntity :: SASSEntity -> State SASSEnv SASSEntity
+compileEntity (SASSVariable name value) = modify (M.insert name value) >> return SASSNothing
+compileEntity SASSNothing = return SASSNothing
+compileEntity (SASSRule name value) = do
+  s <- get
+  let expandedValue = evalState (expandValue value) s
+  return $ SASSRule name expandedValue
 
 
+expandValue :: String -> State SASSEnv String
+expandValue value = if isVariableName value then do
+                        s <- get
+                        return . fromJust $ M.lookup (tail value) s
+                    else return value
+
+isVariableName :: String -> Bool
+isVariableName ('$':_) = True
+isVariableName _ = False
 
 
-
-
-
-
-
-
-
--- compile :: SASSDocument -> CSSDocument
--- compile (SASSDocument entities) = CSSDocument $ map compileEntity entities
-
-compileEntity :: SASSEntity -> CSSEntity
-compileEntity (SASSImport file) = CSSImport file
-compileEntity (SASSVariable name value) = CSSNoValue $ "TODO - figure out how to do variables " ++ name ++ value
-compileEntity (SASSToplevelRuleset (SASSRuleset _)) = CSSNoValue "TODO - actually do stuff here"
---compileEntity value = CSSNoValue $ "TODO - figure out what this was" ++ show value
+justs :: [Maybe a] -> [a]
+justs [] = []
+justs (Nothing:xs) = justs xs
+justs ((Just x):xs) = x : justs xs
