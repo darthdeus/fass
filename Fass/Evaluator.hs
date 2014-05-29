@@ -21,9 +21,9 @@ compile :: SASSRuleset -> State SASSEnv SASSRuleset
 compile (SASSRuleset []) = return $ SASSRuleset []
 compile (SASSRuleset [x]) = compileEntity x >>= return . SASSRuleset . (:[])
 compile (SASSRuleset (x:y:_)) = do
-  cx <- compileEntity x
-  cy <- compileEntity y
-  return $ SASSRuleset [cx, cy]
+    cx <- compileEntity x
+    cy <- compileEntity y
+    return $ SASSRuleset [cx, cy]
 --compile (SASSRuleset xs) = return . SASSRuleset . evalState $ compileEntities xs
 
 compileEntities :: SASSEnv -> [SASSEntity] -> [SASSEntity]
