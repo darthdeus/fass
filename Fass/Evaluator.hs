@@ -5,12 +5,12 @@ import qualified Data.Map            as M
 import Data.Maybe
 
 data SASSRuleset = SASSRuleset [SASSEntity]
-                   deriving Show
+                   deriving (Eq, Show)
 
 data SASSEntity = SASSVariable String String
                 | SASSRule String String
                 | SASSNothing
-                  deriving Show
+                  deriving (Eq, Show)
 
 type SASSEnv = M.Map String String
 
