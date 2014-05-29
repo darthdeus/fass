@@ -40,8 +40,7 @@ parseRule = do
 
 parseSelector :: Parser Selector
 parseSelector = do
-    many space
-    many letter
+    spaces >> many letter
 
 parseVariable :: Parser Entity
 parseVariable = do
