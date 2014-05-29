@@ -24,6 +24,12 @@ compile (SASSRuleset (x:y:_)) = do
   cx <- compileEntity x
   cy <- compileEntity y
   return $ SASSRuleset [cx, cy]
+--compile (SASSRuleset xs) = return . SASSRuleset . evalState $ compileEntities xs
+
+compileEntities :: SASSEnv -> [SASSEntity] -> [SASSEntity]
+compileEntities s xs = filter (/= SASSNothing) compiled
+    where compiled = evalState (forM xs compileEntity) s
+
 
 compileEntity :: SASSEntity -> State SASSEnv SASSEntity
 compileEntity (SASSVariable name value) = modify (M.insert name value) >> return SASSNothing
