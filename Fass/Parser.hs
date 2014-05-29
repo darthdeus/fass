@@ -44,11 +44,8 @@ parseSelector = do
 
 parseVariable :: Parser Entity
 parseVariable = do
-    char '$'
-    name <- parsePropertyName
-    many $ char ' '
-    char ':'
-    many $ char ' '
+    name <- char '$' *> parsePropertyName
+    paddedChar ':'
     value <- parsePropertyValue
     optional $ char ';'
     return $ Variable name value
