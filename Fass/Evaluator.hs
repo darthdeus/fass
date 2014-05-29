@@ -25,12 +25,6 @@ compile (SASSRuleset (x:y:_)) = do
   cy <- compileEntity y
   return $ SASSRuleset [cx, cy]
 
-test :: [SASSEntity]
-test = case flip evalState emptyEnv $ compile $ SASSRuleset [SASSVariable "olaf" "#fafafa", SASSRule "color" "$olaf"] of
-  SASSRuleset results -> filter x results
-    where x SASSNothing = False
-          x _ = True
-
 compileEntity :: SASSEntity -> State SASSEnv SASSEntity
 compileEntity (SASSVariable name value) = modify (M.insert name value) >> return SASSNothing
 compileEntity SASSNothing = return SASSNothing
@@ -41,17 +35,24 @@ compileEntity (SASSRule name value) = do
 
 
 expandValue :: String -> State SASSEnv String
-expandValue value = if isVariableName value then do
-                        s <- get
-                        return . fromJust $ M.lookup (tail value) s
+expandValue value = if isVariableName value
+                    then get >>= return . fromJust . M.lookup (tail value)
                     else return value
 
 isVariableName :: String -> Bool
 isVariableName ('$':_) = True
 isVariableName _ = False
 
-
 justs :: [Maybe a] -> [a]
 justs [] = []
 justs (Nothing:xs) = justs xs
 justs ((Just x):xs) = x : justs xs
+
+test :: [SASSEntity]
+test = filter x results
+    where x SASSNothing = False
+          x _ = True
+
+          SASSRuleset results = flip evalState emptyEnv $ compile $ exampleData
+
+exampleData = SASSRuleset [SASSVariable "olaf" "#fafafa", SASSRule "color" "$olaf"]
