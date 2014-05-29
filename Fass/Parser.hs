@@ -3,6 +3,8 @@ module Fass.Parser
 where
 
 import Fass.Types
+import Control.Monad
+import Control.Applicative ((*>), (<*))
 
 -- import Text.Parsec
 import Text.ParserCombinators.Parsec
@@ -13,27 +15,24 @@ eol = char '\n'
 parseEntity :: Parser Entity
 parseEntity = do
     value <- try parseVariable <|> try parseRule <|> parseRuleset
-    many space
+    void spaces
     return value
+
+paddedChar :: Char -> Parser ()
+paddedChar c = void $ spaces >> char c >> spaces
 
 parseRuleset :: Parser Entity
 parseRuleset = do
     selector <- parseSelector
-    many space
-    char '{'
-    many space
-    entities <- many parseEntity
-    many space
-    char '}'
+    entities <- paddedChar '{' *> many parseEntity <* paddedChar '}'
     return $ Ruleset selector entities
 
 parseRule :: Parser Entity
 parseRule = do
-    many space
+    void spaces
     property <- many1 $ letter <|> char '-'
-    many space
-    char ':'
-    many space
+
+    void $ paddedChar ':'
     -- TODO - make this more strict in terms of what can a value be
     value <- many1 $ letter <|> char '$' <|> char '#'
     optional $ char ';'
