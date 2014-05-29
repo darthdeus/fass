@@ -30,7 +30,6 @@ compileEntities :: SASSEnv -> [SASSEntity] -> [SASSEntity]
 compileEntities s xs = filter (/= SASSNothing) compiled
     where compiled = evalState (forM xs compileEntity) s
 
-
 compileEntity :: SASSEntity -> State SASSEnv SASSEntity
 compileEntity (SASSVariable name value) = modify (M.insert name value) >> return SASSNothing
 compileEntity SASSNothing = return SASSNothing
@@ -54,10 +53,7 @@ justs (Nothing:xs) = justs xs
 justs ((Just x):xs) = x : justs xs
 
 test :: [SASSEntity]
-test = filter x results
-    where x SASSNothing = False
-          x _ = True
+test = compileEntities emptyEnv exampleData
 
-          SASSRuleset results = flip evalState emptyEnv $ compile $ exampleData
-
-exampleData = SASSRuleset [SASSVariable "olaf" "#fafafa", SASSRule "color" "$olaf"]
+exampleData :: [SASSEntity]
+exampleData = [SASSVariable "light-text" "#fafafa", SASSVariable "dark-text" "#0f0f0", SASSRule "color" "$light-text"]
