@@ -3,6 +3,7 @@ module Fass.Evaluator where
 import           Control.Monad.State
 import qualified Data.Map            as M
 import Data.Maybe
+import Control.Applicative ((<$>))
 
 data SASSRuleset = SASSRuleset [SASSEntity]
                    deriving (Eq, Show)
@@ -18,25 +19,15 @@ emptyEnv :: SASSEnv
 emptyEnv = M.empty
 
 compile :: SASSRuleset -> State SASSEnv SASSRuleset
-compile (SASSRuleset []) = return $ SASSRuleset []
-compile (SASSRuleset [x]) = compileEntity x >>= return . SASSRuleset . (:[])
-compile (SASSRuleset (x:y:_)) = do
-    cx <- compileEntity x
-    cy <- compileEntity y
-    return $ SASSRuleset [cx, cy]
---compile (SASSRuleset xs) = return . SASSRuleset . evalState $ compileEntities xs
+compile (SASSRuleset entities) = compileEntities entities >>= return . SASSRuleset
 
-compileEntities :: SASSEnv -> [SASSEntity] -> [SASSEntity]
-compileEntities s xs = filter (/= SASSNothing) compiled
-    where compiled = evalState (forM xs compileEntity) s
+compileEntities :: [SASSEntity] -> State SASSEnv [SASSEntity]
+compileEntities xs = filter (/= SASSNothing) <$> forM xs compileEntity
 
 compileEntity :: SASSEntity -> State SASSEnv SASSEntity
-compileEntity (SASSVariable name value) = modify (M.insert name value) >> return SASSNothing
 compileEntity SASSNothing = return SASSNothing
-compileEntity (SASSRule name value) = do
-  s <- get
-  let expandedValue = evalState (expandValue value) s
-  return $ SASSRule name expandedValue
+compileEntity (SASSVariable name value) = modify (M.insert name value) >> return SASSNothing
+compileEntity (SASSRule name value) = SASSRule name <$> expandValue value
 
 expandValue :: String -> State SASSEnv String
 expandValue value = if isVariableName value
