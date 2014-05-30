@@ -47,13 +47,8 @@ isVariableName :: String -> Bool
 isVariableName ('$':_) = True
 isVariableName _ = False
 
-justs :: [Maybe a] -> [a]
-justs [] = []
-justs (Nothing:xs) = justs xs
-justs ((Just x):xs) = x : justs xs
-
-test :: [SASSEntity]
-test = compileEntities emptyEnv exampleData
+-- test :: [SASSEntity]
+-- test = compileEntities emptyEnv exampleData
 
 exampleData :: [SASSEntity]
 exampleData = [SASSVariable "light-text" "#fafafa", SASSVariable "dark-text" "#0f0f0", SASSRule "color" "$light-text"]
