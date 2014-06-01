@@ -1,7 +1,6 @@
 module Main where
 
-import Fass.Parser
-import Fass.Printer
+import Fass
 import Data.Either
 
 main :: IO ()
