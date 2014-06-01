@@ -5,7 +5,9 @@ import Fass.Types
 prettyPrint :: [SASSEntity] -> String
 prettyPrint = concatMap prettyPrintEntity
 
-prettyPrintEntity :: Entity -> String
-prettyPrintEntity (Variable k v) = '$' : k ++ ":" ++ v ++ ";\n"
-prettyPrintEntity (Rule k v) = k ++ ": " ++ v ++ ";\n"
-prettyPrintEntity (Ruleset s inner) = s ++ " {\n" ++ prettyPrint inner ++ "}\n"
+prettyPrintEntity :: SASSEntity -> String
+prettyPrintEntity SASSNothing = ""
+prettyPrintEntity (SASSVariable k v) = '$' : k ++ ":" ++ v ++ ";\n"
+prettyPrintEntity (SASSRule k v) = k ++ ": " ++ v ++ ";\n"
+prettyPrintEntity (SASSNestedRuleset (SASSRuleset s inner)) =
+    s ++ " {\n" ++ prettyPrint inner ++ "}\n"
