@@ -12,7 +12,7 @@ import Text.ParserCombinators.Parsec
 eol :: GenParser Char st Char
 eol = char '\n'
 
-parseEntity :: Parser Entity
+parseEntity :: Parser SASSEntity
 parseEntity = do
     value <- try parseVariable <|> try parseRule <|> parseRuleset
     void spaces
@@ -21,13 +21,13 @@ parseEntity = do
 paddedChar :: Char -> Parser ()
 paddedChar c = void $ spaces >> char c >> spaces
 
-parseRuleset :: Parser Entity
+parseRuleset :: Parser SASSEntity
 parseRuleset = do
     selector <- parseSelector
     entities <- paddedChar '{' *> many parseEntity <* paddedChar '}'
-    return $ Ruleset selector entities
+    return $ SASSNestedRuleset (SASSRuleset selector entities)
 
-parseRule :: Parser Entity
+parseRule :: Parser SASSEntity
 parseRule = do
     void spaces
     property <- many1 $ letter <|> char '-'
@@ -36,19 +36,19 @@ parseRule = do
     -- TODO - make this more strict in terms of what can a value be
     value <- many1 $ letter <|> char '$' <|> char '#'
     optional $ char ';'
-    return $ Rule property value
+    return $ SASSRule property value
 
 parseSelector :: Parser Selector
 parseSelector = do
     spaces >> many letter
 
-parseVariable :: Parser Entity
+parseVariable :: Parser SASSEntity
 parseVariable = do
     name <- char '$' *> parsePropertyName
     paddedChar ':'
     value <- parsePropertyValue
     optional $ char ';'
-    return $ Variable name value
+    return $ SASSVariable name value
 
 parsePropertyName :: Parser Property
 parsePropertyName = many1 $ letter <|> char '-'
@@ -61,5 +61,5 @@ parsePropertyValue = many1 $ letter <|> char '-' <|> char '#'
     -- prefix <- optional (char '#')
 
 
-parseSCSS :: String -> Either ParseError [Entity]
+parseSCSS :: String -> Either ParseError [SASSEntity]
 parseSCSS = parse (many parseEntity) "SCSS Parser"
