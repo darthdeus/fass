@@ -1,12 +1,8 @@
-module Fass.Types
-  ( Document
-  , Selector
-  , Property
-  , Value
-  , Entity(..))
-where
+module Fass.Types where
 
-type Document = [Entity]
+import qualified Data.Map as M
+
+-- type Document = [Entity]
 
 type Selector = String
 type Property = String

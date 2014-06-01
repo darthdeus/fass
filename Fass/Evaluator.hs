@@ -1,19 +1,11 @@
 module Fass.Evaluator where
 
-import           Control.Monad.State
-import qualified Data.Map            as M
+import Fass.Types
+
+import qualified Data.Map as M
+import Control.Monad.State
 import Data.Maybe
 import Control.Applicative ((<$>))
-
-data SASSRuleset = SASSRuleset [SASSEntity]
-                   deriving (Eq, Show)
-
-data SASSEntity = SASSVariable String String
-                | SASSRule String String
-                | SASSNothing
-                  deriving (Eq, Show)
-
-type SASSEnv = M.Map String String
 
 emptyEnv :: SASSEnv
 emptyEnv = M.empty
