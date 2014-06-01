@@ -1,7 +1,6 @@
 module Main where
 
 import Fass.Parser
-import Fass.Compiler
 import Fass.Printer
 import Data.Either
 
