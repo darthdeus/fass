@@ -2,7 +2,7 @@ module Fass.Printer where
 
 import Fass.Types
 
-prettyPrint :: [Entity] -> String
+prettyPrint :: [SASSEntity] -> String
 prettyPrint = concatMap prettyPrintEntity
 
 prettyPrintEntity :: Entity -> String
