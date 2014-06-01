@@ -11,7 +11,7 @@ emptyEnv :: SASSEnv
 emptyEnv = M.empty
 
 compile :: SASSRuleset -> State SASSEnv SASSRuleset
-compile (SASSRuleset entities) = liftM SASSRuleset $ compileEntities entities
+compile (SASSRuleset selector entities) = liftM (SASSRuleset selector) $ compileEntities entities
 
 compileEntities :: [SASSEntity] -> State SASSEnv [SASSEntity]
 compileEntities xs = filter (/= SASSNothing) <$> forM xs compileEntity
