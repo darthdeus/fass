@@ -10,4 +10,4 @@ main = do
     print $ parseSCSS text
 
 test :: IO ()
-test = readFile "sample.scss" >>= (\c -> putStrLn . prettyPrint . flatten . head $ rights [parseSCSS c])
+test = readFile "sample.scss" >>= (\c -> putStrLn . prettyPrint . head $ rights [parseSCSS c])
