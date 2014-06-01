@@ -31,7 +31,7 @@ compileEntity (SASSRule name value) = SASSRule name <$> expandValue value
 
 expandValue :: String -> State SASSEnv String
 expandValue value = if isVariableName value
-                    then get >>= return . fromJust . M.lookup (tail value)
+                    then liftM (fromJust . M.lookup (tail value)) get
                     else return value
 
 isVariableName :: String -> Bool
