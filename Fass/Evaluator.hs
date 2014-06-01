@@ -20,6 +20,9 @@ compileEntity :: SASSEntity -> State SASSEnv SASSEntity
 compileEntity SASSNothing = return SASSNothing
 compileEntity (SASSVariable name value) = modify (M.insert name value) >> return SASSNothing
 compileEntity (SASSRule name value) = SASSRule name <$> expandValue value
+compileEntity (SASSNestedRuleset (SASSRuleset selector rules)) = do
+    c <- compileEntities rules
+    return . SASSNestedRuleset $ SASSRuleset selector c
 
 expandValue :: String -> State SASSEnv String
 expandValue value = if isVariableName value
