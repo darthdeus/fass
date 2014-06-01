@@ -38,8 +38,8 @@ isVariableName :: String -> Bool
 isVariableName ('$':_) = True
 isVariableName _ = False
 
--- test :: [SASSEntity]
--- test = compileEntities emptyEnv exampleData
+test :: [SASSEntity]
+test = flip evalState emptyEnv $ compileEntities exampleData
 
 exampleData :: [SASSEntity]
 exampleData = [SASSVariable "light-text" "#fafafa", SASSVariable "dark-text" "#0f0f0", SASSRule "color" "$light-text"]
