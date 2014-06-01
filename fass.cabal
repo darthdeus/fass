@@ -25,13 +25,13 @@ library
 
 executable fass
   ghc-options:
-  main-is:             Main.hs
+  main-is:            Main.hs
   -- other-modules:
   -- other-exensions:
-  build-depends:       base >=4.7 && <4.8,
-                       parsec >=3.1 && <3.2,
-                       mtl,
-                       containers
+  build-depends:      base >=4.7 && <4.8,
+                      parsec >=3.1 && <3.2,
+                      mtl,
+                      containers
 
   -- hs-source-dirs:
   default-language:    Haskell2010
