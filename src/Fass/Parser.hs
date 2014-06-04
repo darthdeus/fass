@@ -54,12 +54,7 @@ parsePropertyName :: Parser Property
 parsePropertyName = many1 $ letter <|> char '-'
 
 parsePropertyValue :: Parser Value
-parsePropertyValue = many1 $ letter <|> char '-' <|> char '#'
-    -- Not sure how to solve this prefix, since the return type in the
-    -- monad isn't a string, so I can't concatenate it with the value
-    -- itself
-    -- prefix <- optional (char '#')
-
+parsePropertyValue = many1 $ letter <|> oneOf "-#"
 
 parseSCSS :: String -> Either ParseError [SASSEntity]
 parseSCSS = parse (many parseEntity) "SCSS Parser"

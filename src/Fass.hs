@@ -5,4 +5,3 @@ module Fass
 
 import Fass.Parser (parseSCSS)
 import Fass.Printer (prettyPrint)
-
