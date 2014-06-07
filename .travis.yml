@@ -3,7 +3,6 @@ notifications:
   email: false
 ghc:
   - 7.6
-  - 7.4
 
 script:
   - cabal configure
