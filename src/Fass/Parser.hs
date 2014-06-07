@@ -31,9 +31,9 @@ rule = do
     property <- many1 $ letter <|> char '-'
 
     void $ paddedChar ':'
-    -- TODO - make this more strict in terms of what can a value be
-    value <- many1 $ letter <|> oneOf " $#-()," <|> digit
-    --value <- many1 $ letter <|> char '$' <|> char '#' <|> char '-' <|> char '('
+
+    value <- propertyValue
+
     optional $ char ';'
     return $ SASSRule property value
 
