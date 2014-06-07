@@ -1,10 +1,11 @@
 module Main where
 
 import Fass
+import Fass.Parser
 import Fass.Types
 import Test.Hspec
-import Fass.Parser
 import Text.Parsec.Prim
+import Text.Parsec.String
 
 testParser parser input = parse parser "test parser" input
 
