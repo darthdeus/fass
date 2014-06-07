@@ -1,9 +1,12 @@
 module Main where
 
+import Control.Monad
 import Fass
 import Fass.Parser
 import Fass.Types
 import Test.Hspec
+import Test.Hspec.Formatters
+import Test.Hspec.Runner
 import Text.Parsec.Prim
 import Text.Parsec.String
 
@@ -20,7 +23,7 @@ testParserEqual parser input = testParser parser input `matchRight` input
 -- let per = errorToString . parseSCSS
 
 main :: IO ()
-main = hspec $ do
+main = void $ hspecWith (defaultConfig { configFormatter = progress }) $ do
     describe "SCSS parser" $ do
         it "parses simple CSS" $
             parseSCSS "p { color: #fff; }" `matchRight`
@@ -115,3 +118,7 @@ main = hspec $ do
             testParser ruleset "p {}" `matchRight` SASSNestedRuleset (SASSRuleset "p" [])
             testParser ruleset ".red {}" `matchRight` SASSNestedRuleset (SASSRuleset ".red" [])
             testParser ruleset "  div   {}" `matchRight` SASSNestedRuleset (SASSRuleset "div" [])
+
+        it "works for simple properties" $ do
+            testParser ruleset "p { color: red; }" `matchRight`
+                SASSNestedRuleset (SASSRuleset "p" [SASSRule "color" "red"])
