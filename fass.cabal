@@ -5,7 +5,8 @@ name:                fass
 version:             0.1.0.0
 synopsis:            Fass is a SASS compiler for Haskell.
 description:         Fass is a fast implementation of the original Ruby SASS compiler, written in Haskell.
--- license:
+
+license:             MIT
 license-file:        LICENSE
 author:              Jakub Arnold
 maintainer:          darthdeus@gmail.com
