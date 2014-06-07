@@ -49,7 +49,7 @@ variable = do
     return $ SASSVariable name value
 
 propertyName :: Parser Property
-propertyName = many1 $ letter <|> oneOf "-*"
+propertyName = many1 $ letter <|> oneOf "_-*"
 
 propertyValue :: Parser Value
 propertyValue = many1 $ noneOf ";"

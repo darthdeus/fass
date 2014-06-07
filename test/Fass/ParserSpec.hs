@@ -26,7 +26,7 @@ main :: IO ()
 main = void $ hspecWith (defaultConfig { configFormatter = progress }) spec
 
 spec = do
-    describe "SCSS parser" $ do
+    describe "SCSS parser" $
         it "parses simple CSS" $
             parseSCSS "p { color: #fff; }" `matchRight`
                 [SASSNestedRuleset (SASSRuleset "p" [SASSRule "color" "#fff"])]
@@ -47,11 +47,16 @@ spec = do
             testParser variable "$a: 3" `matchRight` SASSVariable "a" "3"
 
         it "works for colors" $ do
-            testParser variable "$hello: #fff" `matchRight` SASSVariable "hello" "#fff"
+            testParser variable "$red: #fff" `matchRight` SASSVariable "red" "#fff"
+            testParser variable "$blue: #ff0f0c" `matchRight` SASSVariable "blue" "#ff0f0c"
 
-        it "works for rgba colors" $ do
+        it "works for rgb and rgba colors" $ do
             testParser variable "$header-bg: rgba(255, 255, 0)" `matchRight`
                 SASSVariable "header-bg" "rgba(255, 255, 0)"
+
+            testParser variable "$header-bg: rgb(255, 3, 0)" `matchRight`
+                SASSVariable "header-bg" "rgb(255, 3, 0)"
+
 
     describe "selector parser" $ do
         it "works for element names" $ do
@@ -67,12 +72,15 @@ spec = do
 
         it "works for class names" $ do
             testParserEqual selector ".important"
+            testParserEqual selector ".alert.alert-important"
 
         it "classes and ids can be combined" $ do
             testParserEqual selector "#something.alert.alert-important"
+            testParserEqual selector "div#something.alert.alert-important"
 
         it "elements can be nested" $ do
             testParserEqual selector "p span"
+            testParserEqual selector "html body span"
 
         it "operators work as well" $ do
             testParserEqual selector "p > span"
@@ -80,6 +88,7 @@ spec = do
 
         it "works with pseudo classes" $ do
             testParserEqual selector "p:hover"
+            testParserEqual selector "p.red:hover"
 
         it "works for attributes" $ do
             testParserEqual selector "p[data-highlight]"
@@ -87,6 +96,7 @@ spec = do
 
         it "complex combinations of everything else" $ do
             testParserEqual selector "body > #container a:hover"
+            testParserEqual selector "body > div#container[data-red] a:hover"
 
     describe "property name parser" $ do
         it "works for simple strings" $ do
@@ -95,9 +105,11 @@ spec = do
 
         it "works with dashes as well" $ do
             testParserEqual propertyName "background-color"
+            testParserEqual propertyName "font-weight"
 
         it "even IE6 hacks should work" $ do
             testParserEqual propertyName "*color"
+            testParserEqual propertyName "*_color"
 
     describe "property value parser" $ do
         it "works for integers" $ do
@@ -128,8 +140,9 @@ spec = do
             testParser ruleset "p { background-color: #fff; }" `matchRight`
                 SASSNestedRuleset (SASSRuleset "p" [SASSRule "background-color" "#fff"])
 
-        it "works for nested rulesets" $ do
+        it "works for nested rulesets" $
             testParser ruleset "p { color: red; span { color: #f0f0fa; } }" `matchRight`
                 SASSNestedRuleset (SASSRuleset "p"
                                    [SASSRule "color" "red",
                                     SASSNestedRuleset (SASSRuleset "span" [SASSRule "color" "#f0f0fa"])])
+
