@@ -59,4 +59,4 @@ propertyValue :: Parser Value
 propertyValue = many1 $ noneOf ";"
 
 parseSCSS :: String -> Either ParseError [SASSEntity]
-parseSCSS = parse (many entity) "SCSS Parser"
+parseSCSS = parse (many entity <* eof) "SCSS Parser"
