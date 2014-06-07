@@ -1,13 +1,11 @@
-module Fass.Parser
-  (parseSCSS)
-where
+module Fass.Parser where
 
 import Fass.Types
 import Control.Monad
 import Control.Applicative ((*>), (<*))
 
--- import Text.Parsec
-import Text.ParserCombinators.Parsec
+import Text.Parsec
+import Text.Parsec.String
 
 eol :: GenParser Char st Char
 eol = char '\n'
