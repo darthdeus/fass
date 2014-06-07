@@ -40,7 +40,11 @@ rule = do
 selector :: Parser Selector
 selector = do
     void spaces
-    many1 $ letter <|> oneOf " .#-_:>[]=" <|> digit
+    parsed <- many1 $ letter <|> oneOf " .#-_:>[]=" <|> digit
+
+    if last parsed == ' '
+        then return $ init parsed
+        else return parsed
 
 variable :: Parser SASSEntity
 variable = do
