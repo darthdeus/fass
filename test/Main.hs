@@ -24,8 +24,8 @@ main = hspec $ do
     --         testParser variable "variable parser" `shouldBe` Left _
 
   describe "parser" $ do
-    it "handles invalid data" $ do
-      parseSCSS "invalid string" `shouldSatisfy` isLeft
+    -- it "handles invalid data" $ do
+    --   parseSCSS "invalid string" `shouldSatisfy` isLeft
 
     it "parses simple CSS" $
       case parseSCSS "p { color: #fff; }" of
