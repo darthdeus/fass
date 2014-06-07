@@ -1,28 +1,44 @@
 module Main where
 
+import Data.Either
 import Fass
 import Fass.Types
 import Test.Hspec
-import Text.Parsec.Error
-import Text.Parsec.Pos
+import Fass.Parser
+import Text.Parsec.Prim
 
-instance Eq ParseError where
-    x == y = errorPos x == errorPos y &&
-             errorMessages x == errorMessages y
+testParser parser input = parse parser "test parser" input
 
-foo :: Either Int String
-foo = Left 3
+matchRight :: (Show a, Show b, Eq b) => Either a b -> b -> IO ()
+matchRight ex y = case ex of
+    Left x -> fail $ show x
+    Right x -> x `shouldBe` y
+
+        -- let errorToString = either (Left . show) Right
+        -- let per = errorToString . parseSCSS
 
 main :: IO ()
 main = hspec $ do
+    -- describe "variable parser" $ do
+    --     it "must be prefixed by a $" $ do
+    --         testParser variable "variable parser" `shouldBe` Left _
+
   describe "parser" $ do
     it "handles invalid data" $ do
-      let (Left err) = parseSCSS "invalid string"
-      (sourceLine . errorPos $ err) `shouldBe` 1
-      (sourceColumn . errorPos $ err) `shouldBe` 9
+      parseSCSS "invalid string" `shouldSatisfy` isLeft
 
     it "parses simple CSS" $
-      parseSCSS "p { color: #fff; }" `shouldBe` Right [SASSNestedRuleset (SASSRuleset "p" [SASSRule "color" "#fff"])]
+      case parseSCSS "p { color: #fff; }" of
+          Right x -> x `shouldBe` [SASSNestedRuleset (SASSRuleset "p" [SASSRule "color" "#fff"])]
+          Left x -> fail $ show x
 
-    it "parses variables" $
-      parseSCSS "$a: 3" `shouldBe` Right [SASSVariable "a" "3"]
+    describe "variable parser" $ do
+        it "works for integers" $
+            testParser variable "$a: 3" `matchRight` SASSVariable "a" "3"
+
+        it "works for colors" $ do
+            testParser variable "$hello: #fff" `matchRight` SASSVariable "hello" "#fff"
+
+        it "works for rgba colors" $ do
+            testParser variable "$header-bg: rgba(255, 255, 0)" `matchRight`
+                SASSVariable "header-bg" "rgba(255, 255, 0)"
