@@ -1,4 +1,4 @@
-# Fass - Fast SASS for Haskell
+# Fass - Fast SASS for Haskell [![Build Status](https://travis-ci.org/darthdeus/fass.svg?branch=master)](https://travis-ci.org/darthdeus/fass)
 
 Fass is a SASS implementation for Haskell. The goal of the project is
 to have complete compatibility with the [Ruby compiler](http://sass-lang.com).
