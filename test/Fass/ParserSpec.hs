@@ -1,4 +1,4 @@
-module Main where
+module Fass.ParserSpec where
 
 import Control.Monad
 import Fass
@@ -10,7 +10,7 @@ import Test.Hspec.Runner
 import Text.Parsec.Prim
 import Text.Parsec.String
 
-testParser parser input = parse parser "test parser" input
+testParser parser = parse parser "test parser"
 
 matchRight :: (Show a, Show b, Eq b) => Either a b -> b -> IO ()
 matchRight ex y = case ex of
@@ -23,7 +23,9 @@ testParserEqual parser input = testParser parser input `matchRight` input
 -- let per = errorToString . parseSCSS
 
 main :: IO ()
-main = void $ hspecWith (defaultConfig { configFormatter = progress }) $ do
+main = void $ hspecWith (defaultConfig { configFormatter = progress }) spec
+
+spec = do
     describe "SCSS parser" $ do
         it "parses simple CSS" $
             parseSCSS "p { color: #fff; }" `matchRight`
