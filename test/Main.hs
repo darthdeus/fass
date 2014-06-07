@@ -1,14 +1,14 @@
 module Main where
 
+import Fass
+import Fass.Types
 import Test.Hspec
 import Text.Parsec.Error
 import Text.Parsec.Pos
-import Fass
-import Fass.Types
 
 instance Eq ParseError where
-  x == y = errorPos x == errorPos y &&
-   errorMessages x == errorMessages y
+    x == y = errorPos x == errorPos y &&
+             errorMessages x == errorMessages y
 
 foo :: Either Int String
 foo = Left 3
