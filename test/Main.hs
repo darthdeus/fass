@@ -109,3 +109,9 @@ main = hspec $ do
             testParserEqual propertyValue "$header"
             testParserEqual propertyValue "$header-bg"
             testParserEqual propertyValue "$header_bg"
+
+    describe "ruleset parser" $ do
+        it "works for empty ruleset" $ do
+            testParser ruleset "p {}" `matchRight` SASSNestedRuleset (SASSRuleset "p" [])
+            testParser ruleset ".red {}" `matchRight` SASSNestedRuleset (SASSRuleset ".red" [])
+            testParser ruleset "  div   {}" `matchRight` SASSNestedRuleset (SASSRuleset "div" [])
