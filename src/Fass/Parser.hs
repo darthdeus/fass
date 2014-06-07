@@ -39,7 +39,8 @@ rule = do
 
 selector :: Parser Selector
 selector = do
-    spaces >> many letter
+    void spaces
+    many1 $ letter <|> oneOf ".#-_" <|> digit
 
 variable :: Parser SASSEntity
 variable = do
