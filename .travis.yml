@@ -1,4 +1,4 @@
-language: Haskell
+language: haskell
 notifications:
   email: false
 ghc:
