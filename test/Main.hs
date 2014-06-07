@@ -81,3 +81,30 @@ main = hspec $ do
 
         it "complex combinations of everything else" $ do
             testParserEqual selector "body > #container a:hover"
+
+    describe "property name parser" $ do
+        it "works for simple strings" $ do
+            testParserEqual propertyName "color"
+            testParserEqual propertyName "background"
+
+        it "works with dashes as well" $ do
+            testParserEqual propertyName "background-color"
+
+        it "even IE6 hacks should work" $ do
+            testParserEqual propertyName "*color"
+
+    describe "property value parser" $ do
+        it "works for integers" $ do
+            testParserEqual propertyValue "0"
+            testParserEqual propertyValue "10"
+
+        it "works for values with units" $ do
+            testParserEqual propertyValue "0px"
+            testParserEqual propertyValue "10em"
+            testParserEqual propertyValue "10ex"
+            testParserEqual propertyValue "10vh"
+
+        it "works for variable names" $ do
+            testParserEqual propertyValue "$header"
+            testParserEqual propertyValue "$header-bg"
+            testParserEqual propertyValue "$header_bg"
