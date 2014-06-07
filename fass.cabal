@@ -58,3 +58,7 @@ test-suite hspec
                       containers,
                       fass,
                       hspec
+
+source-repository head
+  type: git
+  location: https://github.com/darthdeus/fass.git
