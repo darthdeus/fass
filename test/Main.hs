@@ -122,3 +122,12 @@ main = void $ hspecWith (defaultConfig { configFormatter = progress }) $ do
         it "works for simple properties" $ do
             testParser ruleset "p { color: red; }" `matchRight`
                 SASSNestedRuleset (SASSRuleset "p" [SASSRule "color" "red"])
+
+            testParser ruleset "p { background-color: #fff; }" `matchRight`
+                SASSNestedRuleset (SASSRuleset "p" [SASSRule "background-color" "#fff"])
+
+        it "works for nested rulesets" $ do
+            testParser ruleset "p { color: red; span { color: #f0f0fa; } }" `matchRight`
+                SASSNestedRuleset (SASSRuleset "p"
+                                   [SASSRule "color" "red",
+                                    SASSNestedRuleset (SASSRuleset "span" [SASSRule "color" "#f0f0fa"])])
