@@ -24,10 +24,11 @@ library
   hs-source-dirs:   src
   exposed-modules:  Fass
                   , Fass.Types
-
-  other-modules:    Fass.Evaluator
+                  , Fass.Evaluator
                   , Fass.Printer
                   , Fass.Parser
+
+  other-modules:
 
   default-language: Haskell2010
 
