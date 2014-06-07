@@ -28,7 +28,7 @@ ruleset = do
 rule :: Parser SASSEntity
 rule = do
     void spaces
-    property <- many1 $ letter <|> char '-'
+    property <- propertyName
 
     void $ paddedChar ':'
 
