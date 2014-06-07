@@ -32,7 +32,8 @@ rule = do
 
     void $ paddedChar ':'
     -- TODO - make this more strict in terms of what can a value be
-    value <- many1 $ letter <|> char '$' <|> char '#'
+    value <- many1 $ letter <|> oneOf " $#-()," <|> digit
+    --value <- many1 $ letter <|> char '$' <|> char '#' <|> char '-' <|> char '('
     optional $ char ';'
     return $ SASSRule property value
 

@@ -32,6 +32,17 @@ main = hspec $ do
           Right x -> x `shouldBe` [SASSNestedRuleset (SASSRuleset "p" [SASSRule "color" "#fff"])]
           Left x -> fail $ show x
 
+    describe "rule parser" $ do
+        it "works for plain CSS rules" $ do
+            testParser rule "color: red" `matchRight` SASSRule "color" "red"
+            testParser rule "color: red;" `matchRight` SASSRule "color" "red"
+
+        it "works for rules with variables in them" $
+            testParser rule "color: $header-bg" `matchRight` SASSRule "color" "$header-bg"
+
+        it "works for functions" $
+            testParser rule "color: rgba(255, 255, 0)" `matchRight` SASSRule "color" "rgba(255, 255, 0)"
+
     describe "variable parser" $ do
         it "works for integers" $
             testParser variable "$a: 3" `matchRight` SASSVariable "a" "3"
