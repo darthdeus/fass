@@ -54,7 +54,7 @@ propertyName :: Parser Property
 propertyName = many1 $ letter <|> oneOf "-*"
 
 propertyValue :: Parser Value
-propertyValue = many1 $ anyChar
+propertyValue = many1 $ noneOf ";"
 
 parseSCSS :: String -> Either ParseError [SASSEntity]
 parseSCSS = parse (many entity) "SCSS Parser"
