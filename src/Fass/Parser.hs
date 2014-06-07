@@ -8,9 +8,6 @@ import qualified Data.Text as T
 import Text.Parsec
 import Text.Parsec.String
 
-eol :: GenParser Char st Char
-eol = char '\n'
-
 entity :: Parser SASSEntity
 entity = do
     value <- try variable <|> try rule <|> ruleset
