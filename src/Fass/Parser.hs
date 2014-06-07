@@ -51,7 +51,7 @@ variable = do
     return $ SASSVariable name value
 
 propertyName :: Parser Property
-propertyName = many1 $ letter <|> char '-'
+propertyName = many1 $ letter <|> oneOf "-*"
 
 propertyValue :: Parser Value
 propertyValue = many1 $ anyChar
