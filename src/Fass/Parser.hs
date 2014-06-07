@@ -1,9 +1,10 @@
 module Fass.Parser where
 
-import Fass.Types
-import Control.Monad
 import Control.Applicative ((*>), (<*))
+import Control.Monad
+import Fass.Types
 
+import qualified Data.Text as T
 import Text.Parsec
 import Text.Parsec.String
 
