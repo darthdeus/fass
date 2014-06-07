@@ -37,12 +37,8 @@ rule = do
 
 selector :: Parser Selector
 selector = do
-    void spaces
-    parsed <- many1 $ letter <|> oneOf " .#-_:>[]=" <|> digit
-
-    if last parsed == ' '
-        then return $ init parsed
-        else return parsed
+    result <- many1 $ letter <|> oneOf " .#-_:>[]=" <|> digit
+    return . T.unpack . T.strip . T.pack $ result
 
 variable :: Parser SASSEntity
 variable = do
