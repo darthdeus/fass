@@ -40,7 +40,7 @@ rule = do
 selector :: Parser Selector
 selector = do
     void spaces
-    many1 $ letter <|> oneOf ".#-_" <|> digit
+    many1 $ letter <|> oneOf " .#-_:>[]=" <|> digit
 
 variable :: Parser SASSEntity
 variable = do
