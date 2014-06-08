@@ -18,7 +18,12 @@ spec = do
 
     describe "inlineEntity" $ do
         it "replaces variable entities with nothing" $ do
-            eval inlineEntity (SASSVariable "header" "#fff") `shouldBe` SASSNothing
+            let definition = SASSVariable "header" "#fff"
+
+            let (ent, env) = runState (inlineEntity definition) emptyEnv
+            ent `shouldBe` SASSNothing
+            M.lookup "header" env `shouldBe` Just "#fff"
+            M.size env `shouldBe` 1
 
         it "doesn't change rules with no variables" $ do
             let entity = SASSRule "color" "red"
