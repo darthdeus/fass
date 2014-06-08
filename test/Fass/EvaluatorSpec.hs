@@ -11,5 +11,3 @@ spec = do
         it "does nothing for an empty ruleset" $ do
             let input = SASSRuleset "p" []
             flip evalState emptyEnv (inlineVariables input) `shouldBe` input
-
-    it "foo" (True `shouldBe` True)
