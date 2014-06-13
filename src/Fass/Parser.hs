@@ -28,9 +28,7 @@ rule = do
     void spaces
     property <- propertyName
 
-    void $ paddedChar ':'
-
-    value <- propertyValue
+    value <- paddedChar ':' *> propertyValue
 
     optional $ char ';'
     return $ SASSRule property value
