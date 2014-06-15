@@ -9,11 +9,10 @@ import Text.Parsec hiding (State, parse)
 import Text.Parsec.Indent
 import Control.Monad.State
 
-type Matcher a b = ParsecT String a (State SourcePos) b
-type Parser a = Matcher () a
+type Parser a = ParsecT String () (State SourcePos) a
 
 parseSass :: String -> Either ParseError [Entity]
-parseSass i = runIndent "Sass Parser" $ runParserT (many entity) () "SassParser" i
+parseSass i = runIndent "Sass Parser" $ runParserT entityList () "SassParser" i
 
 entity :: Parser Entity
 entity = do
@@ -21,6 +20,9 @@ entity = do
     value <- try variable <|> try rule <|> ruleset'
     void spaces
     return value
+
+entityList :: Parser [Entity]
+entityList = many entity <* eof
 
 paddedChar :: Char -> Parser ()
 paddedChar c = void $ spaces >> char c >> spaces

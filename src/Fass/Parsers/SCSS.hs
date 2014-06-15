@@ -8,11 +8,17 @@ import qualified Data.Text as T
 import Text.Parsec
 import Text.Parsec.String
 
+parseSCSS :: String -> Either ParseError [Entity]
+parseSCSS = parse (many entity <* eof) "SCSS Parser"
+
 entity :: Parser Entity
 entity = do
     value <- try variable <|> try rule <|> ruleset'
     void spaces
     return value
+
+entityList :: Parser [Entity]
+entityList = many entity <* eof
 
 paddedChar :: Char -> Parser ()
 paddedChar c = void $ spaces >> char c >> spaces
@@ -51,6 +57,3 @@ propertyName = many1 $ letter <|> oneOf "_-*"
 
 propertyValue :: Parser Value
 propertyValue = many1 $ noneOf ";"
-
-parseSCSS :: String -> Either ParseError [Entity]
-parseSCSS = parse (many entity <* eof) "SCSS Parser"
