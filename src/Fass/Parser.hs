@@ -8,7 +8,7 @@ import qualified Data.Text as T
 import Text.Parsec
 import Text.Parsec.String
 
-entity :: Parser SASSEntity
+entity :: Parser Entity
 entity = do
     value <- try variable <|> try rule <|> ruleset
     void spaces
@@ -17,13 +17,13 @@ entity = do
 paddedChar :: Char -> Parser ()
 paddedChar c = void $ spaces >> char c >> spaces
 
-ruleset :: Parser SASSEntity
+ruleset :: Parser Entity
 ruleset = do
     s <- selector
     entities <- paddedChar '{' *> many entity <* paddedChar '}'
-    return $ SASSNestedRuleset (SASSRuleset s entities)
+    return $ Nested (Ruleset s entities)
 
-rule :: Parser SASSEntity
+rule :: Parser Entity
 rule = do
     void spaces
     property <- propertyName
@@ -31,20 +31,20 @@ rule = do
     value <- paddedChar ':' *> propertyValue
 
     optional $ char ';'
-    return $ SASSRule property value
+    return $ Rule property value
 
 selector :: Parser Selector
 selector = do
     result <- many1 $ letter <|> oneOf " .#-_:>[]=" <|> digit
-    return . T.unpack . T.strip . T.pack $ result
+    return . Selector . T.unpack . T.strip . T.pack $ result
 
-variable :: Parser SASSEntity
+variable :: Parser Entity
 variable = do
     name <- char '$' *> propertyName
     paddedChar ':'
     value <- propertyValue
     optional $ char ';'
-    return $ SASSVariable name value
+    return $ Variable name value
 
 propertyName :: Parser Property
 propertyName = many1 $ letter <|> oneOf "_-*"
@@ -52,5 +52,5 @@ propertyName = many1 $ letter <|> oneOf "_-*"
 propertyValue :: Parser Value
 propertyValue = many1 $ noneOf ";"
 
-parseSCSS :: String -> Either ParseError [SASSEntity]
+parseSCSS :: String -> Either ParseError [Entity]
 parseSCSS = parse (many entity <* eof) "SCSS Parser"
