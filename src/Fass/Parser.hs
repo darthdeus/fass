@@ -52,5 +52,8 @@ propertyName = many1 $ letter <|> oneOf "_-*"
 propertyValue :: Parser Value
 propertyValue = many1 $ noneOf ";"
 
+entityList :: Parser [Entity]
+entityList = many entity <* eof
+
 parseSCSS :: String -> Either ParseError [Entity]
-parseSCSS = parse (many entity <* eof) "SCSS Parser"
+parseSCSS = parse entityList "SCSS Parser"
