@@ -24,7 +24,9 @@ inlineEntity :: Entity -> State SASSEnv Entity
 inlineEntity x = case x of
             Variable name value -> modify (M.insert name value) >> return Null
             Rule name value -> Rule name <$> expandValue value
-            Nested _ -> return Null
+            Nested ruleset -> do
+                current <- get
+                return $ Nested $ flip evalState current $ inlineVariables ruleset
             _ -> return Null
 
 expandValue :: String -> State SASSEnv String
