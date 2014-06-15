@@ -1,15 +1,14 @@
 module Main where
 
-import Fass
-import Data.Either
+import Fass.Compiler
 
 main :: IO ()
 main = do
     text <- readFile "sample.scss"
-    print $ parseSCSS text
+    print $ compile text
 
 test :: IO ()
 test = readFile "sample.scss" >>= return . debugOutput >>= putStrLn
 
 debugOutput :: String -> String
-debugOutput c = prettyPrint . head $ rights [parseSCSS c]
+debugOutput c = compile c
