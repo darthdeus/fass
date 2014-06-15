@@ -4,7 +4,8 @@ build:
 	ghc -o fass src/Main.hs -H64m -Wall -isrc
 
 run:
-	./fass
+	./fass sample.sass
+	./fass sample.scss
 
 clean:
 	rm -f -- $(shell find . -name '*.hi')

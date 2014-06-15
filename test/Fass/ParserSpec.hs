@@ -2,12 +2,14 @@
 module Fass.ParserSpec where
 
 import Control.Monad
-import Fass
-import Fass.Parser
+
+import Fass.Parsers.SCSS
 import Fass.Types
+
 import Test.Hspec
 import Test.Hspec.Formatters
 import Test.Hspec.Runner
+
 import Text.Parsec.Prim
 import Text.Parsec.String
 
