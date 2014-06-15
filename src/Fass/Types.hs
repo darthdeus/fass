@@ -21,7 +21,7 @@ instance Monoid Selector where
         | otherwise = Selector $ mungle x y
 
 mungle :: String -> String -> String
-mungle x y = intercalate "," $ [ a ++ " " ++ b | a <- (splitOn "," x), b <- (splitOn "," y) ]
+mungle x y = intercalate ", " $ [ a ++ " " ++ b | a <- (splitOn "," x), b <- (splitOn "," y) ]
 
 
 instance IsString Selector where
