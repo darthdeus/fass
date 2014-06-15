@@ -5,21 +5,24 @@ import Fass.Types
 import qualified Data.Map as M
 import Control.Monad.State
 import Data.Maybe
+import Data.Monoid
+import Data.List
 import Control.Applicative ((<$>))
+import Control.Lens
 
 emptyEnv :: SASSEnv
 emptyEnv = M.empty
 
-inlineVariables :: SASSRuleset -> State SASSEnv SASSRuleset
-inlineVariables (SASSRuleset s []) = return $ SASSRuleset s []
-inlineVariables (SASSRuleset s entities) = mapM inlineEntity entities >>= return . SASSRuleset s
+inlineVariables :: Ruleset -> State SASSEnv Ruleset
+inlineVariables (Ruleset s []) = return $ Ruleset s []
+inlineVariables (Ruleset s entities) = mapM inlineEntity entities >>= return . Ruleset s
 
-inlineEntity :: SASSEntity -> State SASSEnv SASSEntity
+inlineEntity :: Entity -> State SASSEnv Entity
 inlineEntity x = case x of
-            SASSVariable name value -> modify (M.insert name value) >> return SASSNothing
-            SASSRule name value -> SASSRule name <$> expandValue value
-            SASSNestedRuleset _ -> return SASSNothing
-            _ -> return SASSNothing
+            Variable name value -> modify (M.insert name value) >> return Null
+            Rule name value -> Rule name <$> expandValue value
+            Nested _ -> return Null
+            _ -> return Null
 
 expandValue :: String -> State SASSEnv String
 expandValue value = if isVariableName value
@@ -29,3 +32,12 @@ expandValue value = if isVariableName value
 isVariableName :: String -> Bool
 isVariableName ('$':_) = True
 isVariableName _ = False
+
+flatten :: Ruleset -> [Ruleset]
+flatten x@(Ruleset _ []) = [x]
+flatten (Ruleset s entities) = Ruleset s others : concatMap (moreFlatten s) nested
+  where (nested, others) = partition (not . isn't _Nested) entities
+
+moreFlatten :: Selector -> Entity -> [Ruleset]
+moreFlatten psel (Nested (Ruleset nsel xs)) = [Ruleset (psel <> nsel) xs]
+moreFlatten _ _ = []
