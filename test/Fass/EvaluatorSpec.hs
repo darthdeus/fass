@@ -37,9 +37,25 @@ spec = do
             evalState entity initState `shouldBe`
                 Rule "color" "#fafafa"
 
+        -- it "works for sample variables" $ do
+        --    let input = [Variable "color" "red", Nested (Ruleset "a" [Rule "color" "$color"])]
+
+
+    describe "inline list" $ do
+        it "works for nested elements" $ do
+            let input = Ruleset "div" [Nested (Ruleset "img" [Rule "border" "0px"])]
+
+            inlineList [input] `shouldBe` [input]
+
     describe "unwrap" $ do
         it "flattens nested rulesets" $ do
             let input = Ruleset "p" [Nested (Ruleset "span" [Rule "color" "red"])]
 
             let expected = Ruleset "p span" [Rule "color" "red"]
+            flatten input `shouldBe` [expected]
+
+        it "wroks for elements only used for nesting" $ do
+            let input = Ruleset "div" [Nested (Ruleset "img" [Rule "border" "0px"])]
+            let expected = Ruleset "div img" [Rule "border" "0px"]
+
             flatten input `shouldBe` [expected]
