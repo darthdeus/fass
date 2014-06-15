@@ -1,14 +1,12 @@
 module Main where
 
+import System.Environment
 import Fass.Compiler
 
 main :: IO ()
 main = do
-    text <- readFile "sample.scss"
-    print $ compile text
-
-test :: IO ()
-test = readFile "sample.scss" >>= return . debugOutput >>= putStrLn
-
-debugOutput :: String -> String
-debugOutput c = compile c
+    as <- getArgs
+    if null as then
+      error "Usage: ./fass <file>"
+    else
+      compileFile (head as) >>= putStrLn
