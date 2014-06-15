@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Fass.ParserSpec where
 
 import Control.Monad
@@ -19,6 +20,9 @@ matchRight ex y = case ex of
 
 testParserEqual parser input = testParser parser input `matchRight` input
 
+testSelector :: String -> IO ()
+testSelector string = testParser selector string `matchRight` Selector string
+
 -- let errorToString = either (Left . show) Right
 -- let per = errorToString . parseSCSS
 
@@ -29,74 +33,74 @@ spec = do
     describe "SCSS parser" $
         it "parses simple CSS" $
             parseSCSS "p { color: #fff; }" `matchRight`
-                [SASSNestedRuleset (SASSRuleset "p" [SASSRule "color" "#fff"])]
+                [Nested (Ruleset "p" [Rule "color" "#fff"])]
 
     describe "rule parser" $ do
         it "works for plain CSS rules" $ do
-            testParser rule "color: red" `matchRight` SASSRule "color" "red"
-            testParser rule "color: red;" `matchRight` SASSRule "color" "red"
+            testParser rule "color: red" `matchRight` Rule "color" "red"
+            testParser rule "color: red;" `matchRight` Rule "color" "red"
 
         it "works for rules with variables in them" $
-            testParser rule "color: $header-bg" `matchRight` SASSRule "color" "$header-bg"
+            testParser rule "color: $header-bg" `matchRight` Rule "color" "$header-bg"
 
         it "works for functions" $
-            testParser rule "color: rgba(255, 255, 0)" `matchRight` SASSRule "color" "rgba(255, 255, 0)"
+            testParser rule "color: rgba(255, 255, 0)" `matchRight` Rule "color" "rgba(255, 255, 0)"
 
     describe "variable parser" $ do
         it "works for integers" $
-            testParser variable "$a: 3" `matchRight` SASSVariable "a" "3"
+            testParser variable "$a: 3" `matchRight` Variable "a" "3"
 
         it "works for colors" $ do
-            testParser variable "$red: #fff" `matchRight` SASSVariable "red" "#fff"
-            testParser variable "$blue: #ff0f0c" `matchRight` SASSVariable "blue" "#ff0f0c"
+            testParser variable "$red: #fff" `matchRight` Variable "red" "#fff"
+            testParser variable "$blue: #ff0f0c" `matchRight` Variable "blue" "#ff0f0c"
 
         it "works for rgb and rgba colors" $ do
             testParser variable "$header-bg: rgba(255, 255, 0)" `matchRight`
-                SASSVariable "header-bg" "rgba(255, 255, 0)"
+                Variable "header-bg" "rgba(255, 255, 0)"
 
             testParser variable "$header-bg: rgb(255, 3, 0)" `matchRight`
-                SASSVariable "header-bg" "rgb(255, 3, 0)"
+                Variable "header-bg" "rgb(255, 3, 0)"
 
 
     describe "selector parser" $ do
         it "works for element names" $ do
-            testParserEqual selector "p"
-            testParserEqual selector "span"
-            testParserEqual selector "canvas"
+            testSelector "p"
+            testSelector "span"
+            testSelector "canvas"
 
         it "works for ids" $ do
-            testParserEqual selector "#something"
-            testParserEqual selector "#id-with-dashes"
-            testParserEqual selector "#underscores_and-dashes"
-            testParserEqual selector "#underscores_and-dashes123_4-5"
+            testSelector "#something"
+            testSelector "#id-with-dashes"
+            testSelector "#underscores_and-dashes"
+            testSelector "#underscores_and-dashes123_4-5"
 
         it "works for class names" $ do
-            testParserEqual selector ".important"
-            testParserEqual selector ".alert.alert-important"
+            testSelector ".important"
+            testSelector ".alert.alert-important"
 
         it "classes and ids can be combined" $ do
-            testParserEqual selector "#something.alert.alert-important"
-            testParserEqual selector "div#something.alert.alert-important"
+            testSelector "#something.alert.alert-important"
+            testSelector "div#something.alert.alert-important"
 
         it "elements can be nested" $ do
-            testParserEqual selector "p span"
-            testParserEqual selector "html body span"
+            testSelector "p span"
+            testSelector "html body span"
 
         it "operators work as well" $ do
-            testParserEqual selector "p > span"
-            testParserEqual selector ".container > .div p > span"
+            testSelector "p > span"
+            testSelector ".container > .div p > span"
 
         it "works with pseudo classes" $ do
-            testParserEqual selector "p:hover"
-            testParserEqual selector "p.red:hover"
+            testSelector "p:hover"
+            testSelector "p.red:hover"
 
         it "works for attributes" $ do
-            testParserEqual selector "p[data-highlight]"
-            testParserEqual selector "p[data-highlight=true]"
+            testSelector "p[data-highlight]"
+            testSelector "p[data-highlight=true]"
 
         it "complex combinations of everything else" $ do
-            testParserEqual selector "body > #container a:hover"
-            testParserEqual selector "body > div#container[data-red] a:hover"
+            testSelector "body > #container a:hover"
+            testSelector "body > div#container[data-red] a:hover"
 
     describe "property name parser" $ do
         it "works for simple strings" $ do
@@ -129,20 +133,19 @@ spec = do
 
     describe "ruleset parser" $ do
         it "works for empty ruleset" $ do
-            testParser ruleset "p {}" `matchRight` SASSNestedRuleset (SASSRuleset "p" [])
-            testParser ruleset ".red {}" `matchRight` SASSNestedRuleset (SASSRuleset ".red" [])
-            testParser ruleset "  div   {}" `matchRight` SASSNestedRuleset (SASSRuleset "div" [])
+            testParser ruleset "p {}" `matchRight` Nested (Ruleset "p" [])
+            testParser ruleset ".red {}" `matchRight` Nested (Ruleset ".red" [])
+            testParser ruleset "  div   {}" `matchRight` Nested (Ruleset "div" [])
 
         it "works for simple properties" $ do
             testParser ruleset "p { color: red; }" `matchRight`
-                SASSNestedRuleset (SASSRuleset "p" [SASSRule "color" "red"])
+                Nested (Ruleset "p" [Rule "color" "red"])
 
             testParser ruleset "p { background-color: #fff; }" `matchRight`
-                SASSNestedRuleset (SASSRuleset "p" [SASSRule "background-color" "#fff"])
+                Nested (Ruleset "p" [Rule "background-color" "#fff"])
 
         it "works for nested rulesets" $
             testParser ruleset "p { color: red; span { color: #f0f0fa; } }" `matchRight`
-                SASSNestedRuleset (SASSRuleset "p"
-                                   [SASSRule "color" "red",
-                                    SASSNestedRuleset (SASSRuleset "span" [SASSRule "color" "#f0f0fa"])])
-
+                Nested (Ruleset "p"
+                        [Rule "color" "red",
+                         Nested (Ruleset "span" [Rule "color" "#f0f0fa"])])
