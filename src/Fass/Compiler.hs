@@ -1,18 +1,13 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Fass.Compiler where
 
-import Control.Monad.State
+import qualified Data.Text as T
+import Text.Parsec (ParseError)
 import Control.Lens
-import Fass.Evaluator
-import Fass.Printer
-import Fass.Types
-
 
 import Fass.Parsers.Sass (parseSass)
 import Fass.Parsers.SCSS (parseSCSS)
 
-import Text.Parsec (ParseError)
-import Data.List.Split
-import Control.Lens
 import Fass.Evaluator
 import Fass.Printer
 import Fass.Types
@@ -28,6 +23,6 @@ compileEverything entities = prettyPrint $ concatMap flatten entities
 compileFile :: String -> IO String
 compileFile f = do
   code <- readFile f
-  let parse = case last $ splitOn "." f of "sass" -> parseSass
-                                           _      -> parseSCSS
+  let parse = case last $ T.splitOn "." (T.pack f) of "sass" -> parseSass
+                                                      _      -> parseSCSS
   return $ compile (parse code)
