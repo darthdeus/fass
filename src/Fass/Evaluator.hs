@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Fass.Evaluator where
 
 import Fass.Types
@@ -39,20 +40,12 @@ inlineVariable :: SASSEnv -> String -> String
 inlineVariable env ('$':value) = maybe "" id $ M.lookup value env
 inlineVariable _ value = value
 
-isVariableName :: String -> Bool
-isVariableName ('$':_) = True
-isVariableName _ = False
-
 unwrap :: [Entity] -> [Ruleset]
-unwrap entities = concatMap flatten $ entities ^.. traverse._Nested
+unwrap entities = concatMap (flatten "") $ entities ^.. traverse._Nested
 
-flatten :: Ruleset -> [Ruleset]
-flatten x@(Ruleset _ []) = [x]
-flatten (Ruleset s entities) = if null others then unwrapped
-                               else Ruleset s others : unwrapped
-  where (nested, others) = partition (not . isn't _Nested) entities
-        unwrapped = concatMap (moreFlatten s) nested
-
-moreFlatten :: Selector -> Entity -> [Ruleset]
-moreFlatten psel (Nested (Ruleset nsel xs)) = [Ruleset (psel <> nsel) xs]
-moreFlatten _ _ = []
+flatten :: Selector -> Ruleset -> [Ruleset]
+flatten prefix (Ruleset s entities) = if null rules then unwrapped
+                                      else Ruleset (prefix <> s) rules : unwrapped
+  where
+    (rules, nested) = partition (isn't _Nested) entities
+    unwrapped = concatMap (flatten (prefix <> s)) $ nested ^.. traverse._Nested

@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Fass.Compiler where
 
 import Control.Monad.State
@@ -15,7 +16,7 @@ compile input = case parseSCSS input of
 compileEverything :: [Entity] -> String
 compileEverything [] = ""
 compileEverything entities =
-    prettyPrint $ concatMap flatten $ rulesets
+    prettyPrint $ concatMap (flatten "") $ rulesets
 
     where
       inlined :: [Entity]

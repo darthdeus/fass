@@ -13,7 +13,9 @@ newtype Selector = Selector String deriving (Show, Eq)
 
 instance Monoid Selector where
     mempty = Selector ""
-    mappend (Selector x) (Selector y) = Selector (x ++ " " ++ y)
+    mappend (Selector x) (Selector y)
+        | x == "" = Selector y
+        | otherwise = Selector (x ++ " " ++ y)
 
 instance IsString Selector where
     fromString x = Selector x
