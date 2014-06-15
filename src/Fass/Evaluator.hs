@@ -29,6 +29,7 @@ inlineEntity x = case x of
             Nested ruleset -> do
                 current <- get
                 return . Nested . flip evalState current $ inlineVariables ruleset
+            Comment c -> return $ Comment c
             _ -> return Null
 
 expandValue :: String -> State SASSEnv String
@@ -40,12 +41,14 @@ inlineVariable :: SASSEnv -> String -> String
 inlineVariable env ('$':value) = maybe "" id $ M.lookup value env
 inlineVariable _ value = value
 
-unwrap :: [Entity] -> [Ruleset]
-unwrap entities = concatMap (flatten "") $ entities ^.. traverse._Nested
+unwrap :: [Entity] -> [Entity]
+unwrap entities = concatMap (flatten "") $ entities
 
-flatten :: Selector -> Ruleset -> [Ruleset]
-flatten prefix (Ruleset s entities) = if null rules then unwrapped
-                                      else Ruleset (prefix <> s) rules : unwrapped
+flatten :: Selector -> Entity -> [Entity]
+flatten prefix (Nested (Ruleset s entities)) = if null rules then unwrapped
+                                               else Nested (Ruleset (prefix <> s) rules) : unwrapped
   where
     (rules, nested) = partition (isn't _Nested) entities
-    unwrapped = concatMap (flatten (prefix <> s)) $ nested ^.. traverse._Nested
+    unwrapped = concatMap (flatten (prefix <> s)) $ nested
+flatten _ Null = []
+flatten _ a = [a]

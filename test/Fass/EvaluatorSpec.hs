@@ -47,15 +47,15 @@ spec = do
 
             inlineList [input] `shouldBe` [input]
 
-    describe "unwrap" $ do
+    describe "flatten" $ do
         it "flattens nested rulesets" $ do
-            let input = Ruleset "p" [Nested (Ruleset "span" [Rule "color" "red"])]
+            let input = Nested $ Ruleset "p" [Nested (Ruleset "span" [Rule "color" "red"])]
 
-            let expected = Ruleset "p span" [Rule "color" "red"]
+            let expected = Nested $ Ruleset "p span" [Rule "color" "red"]
             flatten "" input `shouldBe` [expected]
 
-        it "wroks for elements only used for nesting" $ do
-            let input = Ruleset "div" [Nested (Ruleset "img" [Rule "border" "0px"])]
-            let expected = Ruleset "div img" [Rule "border" "0px"]
+        it "works for elements only used for nesting" $ do
+            let input = Nested $ Ruleset "div" [Nested (Ruleset "img" [Rule "border" "0px"])]
+            let expected = Nested $ Ruleset "div img" [Rule "border" "0px"]
 
             flatten "" input `shouldBe` [expected]

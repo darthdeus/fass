@@ -1,9 +1,12 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Fass.Types where
 
 import Control.Lens
 import Data.Monoid
 import Data.String
+import Data.List
+import Data.List.Split
 import qualified Data.Map as M
 
 type Property = String
@@ -15,7 +18,11 @@ instance Monoid Selector where
     mempty = Selector ""
     mappend (Selector x) (Selector y)
         | x == "" = Selector y
-        | otherwise = Selector (x ++ " " ++ y)
+        | otherwise = Selector $ mungle x y
+
+mungle :: String -> String -> String
+mungle x y = intercalate "," $ [ a ++ " " ++ b | a <- (splitOn "," x), b <- (splitOn "," y) ]
+
 
 instance IsString Selector where
     fromString x = Selector x
@@ -23,10 +30,11 @@ instance IsString Selector where
 data Ruleset = Ruleset Selector [Entity] deriving (Eq, Show)
 
 data Entity = Variable String String
-              | Rule String String
-              | Nested Ruleset
-              | Null
-                deriving (Eq, Show)
+            | Comment String
+            | Rule String String
+            | Nested Ruleset
+            | Null
+            deriving (Eq, Show)
 
 type SASSEnv = M.Map String String
 
