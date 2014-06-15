@@ -13,4 +13,4 @@ compile input = case parseSCSS input of
 
 compileEverything :: [Ruleset] -> String
 compileEverything [] = ""
-compileEverything entities = prettyPrint $ concatMap flatten entities
+compileEverything entities = prettyPrint $ concatMap flatten $ inlineList entities
