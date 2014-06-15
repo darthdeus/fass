@@ -8,11 +8,11 @@ import Test.Hspec
 
 spec :: Spec
 spec = describe "Compiler" $ do
-    it "works for a simple SCSS" $ do
-        let input = "p { span { color: red; } }"
-        let output = "p span {\ncolor: red;\n}\n\n"
+    -- it "works for a simple SCSS" $ do
+    --     let input = "p { span { color: red; } }"
+    --     let output = "p span {\ncolor: red;\n}\n\n"
 
-        compile input `shouldBe` output
+    --     compile input `shouldBe` output
 
     it "passes the sass-spec tests" $ do
         root <- getCurrentDirectory
@@ -28,4 +28,5 @@ runSpec prefix = do
     input <- readFile $ prefix </> "input.scss"
     expectedOutput <- readFile $ prefix </> "expected_output.css"
 
+    putStrLn prefix
     compile input `shouldBe` expectedOutput
