@@ -149,3 +149,14 @@ spec = do
                 Nested (Ruleset "p"
                         [Rule "color" "red",
                          Nested (Ruleset "span" [Rule "color" "#f0f0fa"])])
+
+
+        it "works for simple nested elements" $ do
+            testParser entityList "div {\n  img {\n    border: 0px;\n  }\n}" `matchRight`
+                [Nested (Ruleset "div"
+                        [Nested (Ruleset "img" [Rule "border" "0px"])])]
+
+        it "works for simple variables" $ do
+            testParser entityList "$color: red;\na {\ncolor: $color;\n}" `matchRight`
+                [Variable "color" "red",
+                 Nested (Ruleset "a" [Rule "color" "$color"])]
