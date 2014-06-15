@@ -3,12 +3,12 @@ module Fass.Evaluator where
 
 import Fass.Types
 
-import qualified Data.Map as M
-import Control.Monad.State
-import Data.Monoid
-import Data.List
 import Control.Applicative ((<$>))
 import Control.Lens
+import Control.Monad.State
+import qualified Data.Map as M
+import Data.Monoid
+import Data.List
 
 emptyEnv :: SASSEnv
 emptyEnv = M.empty

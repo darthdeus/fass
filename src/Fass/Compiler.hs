@@ -1,12 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Fass.Compiler where
 
+import Control.Lens
 import Control.Monad.State
 import Data.Char (isSpace)
-import Fass.Parser
 import Fass.Evaluator
+import Fass.Parser
 import Fass.Printer
 import Fass.Types
+import Text.Regex
 
 compile :: String -> String
 compile input = case parseSCSS input of
@@ -16,11 +18,16 @@ compile input = case parseSCSS input of
 compileEverything :: [Entity] -> String
 compileEverything [] = ""
 compileEverything entities =
-    prettyPrint $ concatMap (flatten "") $ inlined
+    prettyPrint $ over (traverse._Nested._Ruleset._1._Selector) compactSelector $ concatMap (flatten "") $ inlined
 
     where
       inlined :: [Entity]
       inlined = flip evalState emptyEnv $ mapM inlineEntity entities
+
+compactSelector :: String -> String
+compactSelector s = rep " ]" "]" $ rep " +\\*= +" "*=" $ rep " += +" "=" s
+  where
+    rep what with x = subRegex (mkRegex what) x with
 
 minify :: String -> String
 minify css =
