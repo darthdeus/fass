@@ -25,6 +25,7 @@ library
                , lens
                , directory
                , filepath
+               , split
 
   ghc-options:      -Wall
   hs-source-dirs:   src
@@ -73,6 +74,7 @@ test-suite hspec
                     , lens
                     , directory
                     , filepath
+                    , split
 
 source-repository head
   type: git
