@@ -13,6 +13,9 @@ import Control.Lens
 emptyEnv :: SASSEnv
 emptyEnv = M.empty
 
+inlineList :: [Ruleset] -> [Ruleset]
+inlineList xs = flip evalState emptyEnv $ mapM inlineVariables xs
+
 inlineVariables :: Ruleset -> State SASSEnv Ruleset
 inlineVariables (Ruleset s []) = return $ Ruleset s []
 inlineVariables (Ruleset s entities) = mapM inlineEntity entities >>= return . Ruleset s
