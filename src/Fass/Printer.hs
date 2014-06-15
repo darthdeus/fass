@@ -9,5 +9,5 @@ prettyPrintEntity :: Entity -> String
 prettyPrintEntity Null = ""
 prettyPrintEntity (Variable k v) = '$' : k ++ ":" ++ v ++ ";\n"
 prettyPrintEntity (Rule k v) = k ++ ": " ++ v ++ ";\n"
-prettyPrintEntity (Nested (Ruleset s inner)) =
-    show s ++ " {\n" ++ prettyPrint inner ++ "}\n"
+prettyPrintEntity (Nested (Ruleset (Selector s) inner)) =
+    s ++ " {\n" ++ prettyPrint inner ++ "}\n"
