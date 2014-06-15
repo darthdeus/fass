@@ -37,10 +37,6 @@ spec = do
             evalState entity initState `shouldBe`
                 Rule "color" "#fafafa"
 
-        -- it "works for sample variables" $ do
-        --    let input = [Variable "color" "red", Nested (Ruleset "a" [Rule "color" "$color"])]
-
-
     describe "inline list" $ do
         it "works for nested elements" $ do
             let input = Ruleset "div" [Nested (Ruleset "img" [Rule "border" "0px"])]
