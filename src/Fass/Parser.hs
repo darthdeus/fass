@@ -1,6 +1,6 @@
 module Fass.Parser where
 
-import Control.Applicative ((*>), (<*))
+import Control.Applicative ((*>), (<*), (<$>))
 import Control.Monad
 import Fass.Types
 
@@ -10,8 +10,8 @@ import Text.Parsec.String
 
 entity :: Parser Entity
 entity = do
-    value <- try variable <|> try rule <|> ruleset
-    void spaces
+    value <- try comment <|> try variable <|> try rule <|> ruleset
+    spaces
     return value
 
 paddedChar :: Char -> Parser ()
@@ -35,8 +35,17 @@ rule = do
 
 selector :: Parser Selector
 selector = do
-    result <- many1 $ letter <|> oneOf " .#-_:>[]=" <|> digit
+    result <- many1 $ letter <|> oneOf " .,#-_:>[]=" <|> digit
     return . Selector . T.unpack . T.strip . T.pack $ result
+
+comment :: Parser Entity
+comment = try blockComment <|> lineComment
+
+lineComment :: Parser Entity
+lineComment = string "//" >> many (noneOf "\n") >> (void (char '\n') <|> eof) >> return Null
+
+blockComment :: Parser Entity
+blockComment = Comment <$> (string "/*" *> many (noneOf "*") <* string "*/")
 
 variable :: Parser Entity
 variable = do

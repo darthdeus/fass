@@ -10,7 +10,9 @@ import Test.Hspec.Formatters
 import Test.Hspec.Runner
 import Text.Parsec.Prim
 import Text.Parsec.String
+import Text.Parsec.Error
 
+testParser :: Parser a -> String -> Either ParseError a
 testParser parser = parse parser "test parser"
 
 matchRight :: (Show a, Show b, Eq b) => Either a b -> b -> IO ()
@@ -18,6 +20,7 @@ matchRight ex y = case ex of
     Left x -> fail $ show x
     Right x -> x `shouldBe` y
 
+testParserEqual :: Parser String -> String -> IO ()
 testParserEqual parser input = testParser parser input `matchRight` input
 
 testSelector :: String -> IO ()
@@ -29,6 +32,7 @@ testSelector string = testParser selector string `matchRight` Selector string
 main :: IO ()
 main = void $ hspecWith (defaultConfig { configFormatter = progress }) spec
 
+spec :: Spec
 spec = do
     describe "SCSS parser" $
         it "parses simple CSS" $
@@ -102,6 +106,9 @@ spec = do
             testSelector "body > #container a:hover"
             testSelector "body > div#container[data-red] a:hover"
 
+        it "works with selector groups" $ do
+            testSelector "span, strong, em"
+
     describe "property name parser" $ do
         it "works for simple strings" $ do
             testParserEqual propertyName "color"
@@ -150,7 +157,6 @@ spec = do
                         [Rule "color" "red",
                          Nested (Ruleset "span" [Rule "color" "#f0f0fa"])])
 
-
         it "works for simple nested elements" $ do
             testParser entityList "div {\n  img {\n    border: 0px;\n  }\n}" `matchRight`
                 [Nested (Ruleset "div"
@@ -160,3 +166,24 @@ spec = do
             testParser entityList "$color: red;\na {\ncolor: $color;\n}" `matchRight`
                 [Variable "color" "red",
                  Nested (Ruleset "a" [Rule "color" "$color"])]
+
+        it "works for top level comments" $ do
+            testParser entityList "/* hello world */\np { color: red; }" `matchRight`
+                [Comment " hello world ", Nested (Ruleset "p" [Rule "color" "red"])]
+
+        it "works for grouped selectors" $ do
+            testParser entityList "h1, h2 { font-weight: bold; }" `matchRight`
+                [Nested (Ruleset "h1, h2" [Rule "font-weight" "bold"])]
+
+    describe "comment parser" $ do
+        it "works for empty comments" $ do
+            testParser comment "/**/" `matchRight` Comment ""
+            testParser comment "/* */" `matchRight` Comment " "
+            testParser comment "/*\t*/" `matchRight` Comment "\t"
+            testParser comment "/*\n*/" `matchRight` Comment "\n"
+
+        it "works for comments with content" $ do
+            testParser comment "/* hello world */" `matchRight` Comment " hello world "
+
+        it "swallows single line comments" $ do
+            testParser comment "// foo" `matchRight` Null

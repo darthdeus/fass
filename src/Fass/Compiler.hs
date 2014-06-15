@@ -1,7 +1,8 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Fass.Compiler where
 
 import Control.Monad.State
-import Control.Lens
+import Data.Char (isSpace)
 import Fass.Parser
 import Fass.Evaluator
 import Fass.Printer
@@ -15,11 +16,30 @@ compile input = case parseSCSS input of
 compileEverything :: [Entity] -> String
 compileEverything [] = ""
 compileEverything entities =
-    prettyPrint $ concatMap flatten $ rulesets
+    prettyPrint $ concatMap (flatten "") $ inlined
 
     where
       inlined :: [Entity]
       inlined = flip evalState emptyEnv $ mapM inlineEntity entities
 
-      rulesets :: [Ruleset]
-      rulesets = inlined ^.. traverse._Nested
+minify :: String -> String
+minify css =
+    trim
+    $ collapseSpace
+    $ newlines css
+
+trim :: String -> String
+trim = f . f where f = reverse . dropWhile isSpace
+
+collapseSpace :: String -> String
+collapseSpace [] = []
+collapseSpace (' ':' ':xs) = collapseSpace (' ':xs)
+collapseSpace (';':' ':xs) = collapseSpace (';':xs)
+collapseSpace ('{':' ':xs) = collapseSpace ('{':xs)
+collapseSpace ('}':' ':xs) = collapseSpace ('}':xs)
+collapseSpace (x:xs) = x:collapseSpace xs
+
+newlines :: String -> String
+newlines [] = []
+newlines ('\n':xs) = ' ':(newlines xs)
+newlines (x:xs) = x:(newlines xs)
