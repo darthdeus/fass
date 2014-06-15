@@ -9,8 +9,9 @@ to have complete compatibility with the [Ruby compiler](http://sass-lang.com).
 # Roadmap
 
 - ~~Compile simple SCSS to CSS~~
-- Resolve nested rulesets in SCSS
-- Variable expansion
+- ~~Resolve nested rulesets in SCSS~~
+- ~~Variable expansion~~
+- Selector groups
 - Mixins
 - Imports
 - Functions
