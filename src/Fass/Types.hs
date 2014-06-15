@@ -19,6 +19,7 @@ instance IsString Selector where
     fromString x = Selector x
 
 data Ruleset = Ruleset Selector [Entity] deriving (Eq, Show)
+
 data Entity = Variable String String
               | Rule String String
               | Nested Ruleset
@@ -29,6 +30,7 @@ type SASSEnv = M.Map String String
 
 makePrisms ''Ruleset
 makePrisms ''Entity
+makePrisms ''Selector
 
 
 -- data Entity = Ruleset Selector [Entity]
