@@ -1,7 +1,3 @@
-module Fass
-  ( parseSCSS
-  , prettyPrint
-  ) where
+module Fass (compileFile) where
 
-import Fass.Parser (parseSCSS)
-import Fass.Printer (prettyPrint)
+import Fass.Compiler (compileFile)
