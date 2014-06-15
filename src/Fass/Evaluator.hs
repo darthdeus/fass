@@ -4,7 +4,6 @@ import Fass.Types
 
 import qualified Data.Map as M
 import Control.Monad.State
-import Data.Maybe
 import Data.Monoid
 import Data.List
 import Control.Applicative ((<$>))
@@ -22,17 +21,23 @@ inlineVariables (Ruleset s entities) = mapM inlineEntity entities >>= return . R
 
 inlineEntity :: Entity -> State SASSEnv Entity
 inlineEntity x = case x of
-            Variable name value -> modify (M.insert name value) >> return Null
+            Variable name value -> do
+                val <- expandValue value
+                modify (M.insert name val) >> return Null
             Rule name value -> Rule name <$> expandValue value
             Nested ruleset -> do
                 current <- get
-                return $ Nested $ flip evalState current $ inlineVariables ruleset
+                return . Nested . flip evalState current $ inlineVariables ruleset
             _ -> return Null
 
 expandValue :: String -> State SASSEnv String
-expandValue value = if isVariableName value
-                    then liftM (fromJust . M.lookup (tail value)) get
-                    else return value
+expandValue value = do
+    env <- get
+    return . unwords . map (inlineVariable env) $ words value
+
+inlineVariable :: SASSEnv -> String -> String
+inlineVariable env ('$':value) = maybe "" id $ M.lookup value env
+inlineVariable _ value = value
 
 isVariableName :: String -> Bool
 isVariableName ('$':_) = True
