@@ -9,9 +9,6 @@ import qualified Data.Map as M
 type Property = String
 type Value = String
 
--- data Entity = Ruleset Selector [Entity]
---             | Variable String String
---             | Rule Property Value
 newtype Selector = Selector String deriving (Show, Eq)
 
 instance Monoid Selector where
@@ -34,21 +31,13 @@ makePrisms ''Ruleset
 makePrisms ''Entity
 
 
+-- data Entity = Ruleset Selector [Entity]
+--             | Variable String String
+--             | Rule Property Value
 --             deriving (Show)
 
 -- newtype CSSDocument = CSSDocument [CSSEntity]
 
 -- data CSSEntity = CSSImport String
 --                | CSSRuleset String
-
-
-data SASSRuleset = SASSRuleset Selector [SASSEntity]
-                   deriving (Eq, Show)
-
-data SASSEntity = SASSVariable String String
-                | SASSRule String String
-                | SASSNestedRuleset SASSRuleset
-                | SASSNothing
-                  deriving (Eq, Show)
-
-type SASSEnv = M.Map String String
+-- type Document = [Entity]
