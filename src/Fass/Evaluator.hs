@@ -35,8 +35,10 @@ isVariableName _ = False
 
 flatten :: Ruleset -> [Ruleset]
 flatten x@(Ruleset _ []) = [x]
-flatten (Ruleset s entities) = Ruleset s others : concatMap (moreFlatten s) nested
+flatten (Ruleset s entities) = if null others then unwrapped
+                               else Ruleset s others : unwrapped
   where (nested, others) = partition (not . isn't _Nested) entities
+        unwrapped = concatMap (moreFlatten s) nested
 
 moreFlatten :: Selector -> Entity -> [Ruleset]
 moreFlatten psel (Nested (Ruleset nsel xs)) = [Ruleset (psel <> nsel) xs]
