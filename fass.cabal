@@ -26,10 +26,11 @@ library
 
   hs-source-dirs:   src
   exposed-modules:  Fass
-                    , Fass.Types
+                    , Fass.Compiler
                     , Fass.Evaluator
                     , Fass.Printer
                     , Fass.Parser
+                    , Fass.Types
 
   other-modules:
 
