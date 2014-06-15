@@ -33,6 +33,9 @@ isVariableName :: String -> Bool
 isVariableName ('$':_) = True
 isVariableName _ = False
 
+unwrap :: [Entity] -> [Ruleset]
+unwrap entities = concatMap flatten $ entities ^.. traverse._Nested
+
 flatten :: Ruleset -> [Ruleset]
 flatten x@(Ruleset _ []) = [x]
 flatten (Ruleset s entities) = if null others then unwrapped
