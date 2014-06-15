@@ -7,5 +7,5 @@ run:
 	./fass
 
 clean:
-	rm -f $(shell find . -name '*.hi')
-	rm -f $(shell find . -name '*.o')
+	rm -f -- $(shell find . -name '*.hi')
+	rm -f -- $(shell find . -name '*.o')
