@@ -23,7 +23,6 @@ instance Monoid Selector where
 mungle :: String -> String -> String
 mungle x y = intercalate ", " $ [ a ++ " " ++ b | a <- (splitOn "," x), b <- (splitOn "," y) ]
 
-
 instance IsString Selector where
     fromString x = Selector x
 
@@ -41,15 +40,3 @@ type SASSEnv = M.Map String String
 makePrisms ''Ruleset
 makePrisms ''Entity
 makePrisms ''Selector
-
-
--- data Entity = Ruleset Selector [Entity]
---             | Variable String String
---             | Rule Property Value
---             deriving (Show)
-
--- newtype CSSDocument = CSSDocument [CSSEntity]
-
--- data CSSEntity = CSSImport String
---                | CSSRuleset String
--- type Document = [Entity]
