@@ -5,6 +5,7 @@ import Fass.Compiler
 import System.Directory
 import System.FilePath.Posix
 import Test.Hspec
+import qualified Data.Text as T
 
 spec :: Spec
 spec = describe "Compiler" $ do
@@ -28,4 +29,14 @@ runSpec prefix = do
     expectedOutput <- readFile $ prefix </> "expected_output.css"
 
     putStrLn prefix
-    compile input `shouldBe` expectedOutput
+
+    -- TODO - Figure out what exactly are the rules for trailing \n.
+    -- It seems that for single ruleset there is no trailing \n,
+    -- but there is one when there is more than one ruleset. I'm not 100%
+    -- sure about this, which is why I'll be trimming them here in both cases.
+
+    trim (compile input) `shouldBe` (trim expectedOutput)
+
+-- TODO - figure out a more effective way to do this
+trim :: String -> String
+trim = T.unpack . T.strip . T.pack
