@@ -2,12 +2,12 @@ module Fass.Printer where
 
 import Fass.Types
 
-prettyPrint :: [Entity] -> String
-prettyPrint = concatMap prettyPrintEntity
+prettyPrint :: [Ruleset] -> String
+prettyPrint = concatMap printRuleset
 
-prettyPrintEntity :: Entity -> String
-prettyPrintEntity Null = ""
-prettyPrintEntity (Variable k v) = '$' : k ++ ":" ++ v ++ ";\n"
-prettyPrintEntity (Rule k v) = k ++ ": " ++ v ++ ";\n"
-prettyPrintEntity (Nested (Ruleset (Selector s) inner)) =
-    s ++ " {\n" ++ prettyPrint inner ++ "}\n"
+printRuleset :: Ruleset -> String
+printRuleset (Ruleset (Selector s) rules) = s ++ " {\n" ++ concatMap printRule rules ++ "}\n\n"
+
+printRule :: Entity -> String
+printRule (Rule key value) = key ++ ": " ++ value ++ ";\n"
+printRule _ = ""
