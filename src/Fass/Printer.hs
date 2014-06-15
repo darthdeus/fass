@@ -1,7 +1,8 @@
 module Fass.Printer where
 
-import Fass.Types
+import Control.Lens
 import Data.List
+import Fass.Types
 
 prettyPrint :: [Entity] -> String
 prettyPrint entities = intercalate "\n" $ toListOf (traverse._Just) $ map (printEntity 0) entities
