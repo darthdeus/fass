@@ -17,7 +17,7 @@ parseSass i = runIndent "Sass Parser" $ runParserT entityList () "SassParser" i
 entity :: Parser Entity
 entity = do
     void spaces
-    value <- try variable <|> try rule <|> ruleset'
+    value <- try variable <|> try rule <|> ruleset
     void spaces
     return value
 
@@ -27,9 +27,9 @@ entityList = many entity <* eof
 paddedChar :: Char -> Parser ()
 paddedChar c = void $ spaces >> char c >> spaces
 
-ruleset' :: Parser Entity
-ruleset' = do
-  rs <- withBlock Ruleset selector' entity
+ruleset :: Parser Entity
+ruleset = do
+  rs <- withBlock Ruleset selector entity
   return $ Nested rs
 
 rule :: Parser Entity
@@ -38,8 +38,8 @@ rule = do
     value <- paddedChar ':' *> propertyValue
     return $ Rule property value
 
-selector' :: Parser Selector
-selector' = do
+selector :: Parser Selector
+selector = do
     result <- many1 $ letter <|> oneOf " .#-_:>[]=" <|> digit
     void spaces
     return . Selector . T.unpack . T.strip . T.pack $ result

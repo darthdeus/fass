@@ -13,7 +13,7 @@ parseSCSS = parse (many entity <* eof) "SCSS Parser"
 
 entity :: Parser Entity
 entity = do
-    value <- try variable <|> try rule <|> ruleset'
+    value <- try variable <|> try rule <|> ruleset
     void spaces
     return value
 
@@ -23,9 +23,9 @@ entityList = many entity <* eof
 paddedChar :: Char -> Parser ()
 paddedChar c = void $ spaces >> char c >> spaces
 
-ruleset' :: Parser Entity
-ruleset' = do
-    s <- selector'
+ruleset :: Parser Entity
+ruleset = do
+    s <- selector
     entities <- paddedChar '{' *> many entity <* paddedChar '}'
     return $ Nested (Ruleset s entities)
 
@@ -39,8 +39,8 @@ rule = do
     optional $ char ';'
     return $ Rule property value
 
-selector' :: Parser Selector
-selector' = do
+selector :: Parser Selector
+selector = do
     result <- many1 $ letter <|> oneOf " .#-_:>[]=" <|> digit
     return . Selector . T.unpack . T.strip . T.pack $ result
 

@@ -28,10 +28,7 @@ data Entity = Variable String String
 
 type SASSEnv = M.Map String String
 
-makePrisms ''Ruleset
 makePrisms ''Entity
-makePrisms ''Selector
-
 
 -- data Entity = Ruleset Selector [Entity]
 --             | Variable String String

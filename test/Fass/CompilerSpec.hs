@@ -2,6 +2,7 @@ module Fass.CompilerSpec where
 
 import Data.List
 import Fass.Compiler
+import Fass.Parsers.SCSS
 import System.Directory
 import System.FilePath.Posix
 import Test.Hspec
@@ -20,12 +21,12 @@ spec = describe "Compiler" $ do
     it "works for simple variables" $ do
         let input = "$color: red;\na {\ncolor: $color;\n}"
 
-        compile input `shouldBe` "a {\n  color: red; }"
+        compile (parseSCSS input) `shouldBe` "a {\n  color: red; }"
 
 runSpec :: FilePath -> IO ()
 runSpec prefix = do
-    input <- readFile $ prefix </> "input.scss"
+    input <- compileFile $ prefix </> "input.scss"
     expectedOutput <- readFile $ prefix </> "expected_output.css"
 
     putStrLn prefix
-    compile input `shouldBe` expectedOutput
+    input `shouldBe` expectedOutput
