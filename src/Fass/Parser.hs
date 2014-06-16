@@ -35,7 +35,7 @@ rule = do
 
 selector :: Parser Selector
 selector = do
-    result <- many1 $ letter <|> oneOf " .,~+#*-_:>[]='\"" <|> digit
+    result <- many1 $ letter <|> oneOf " .,~+#*-_:>[]='\"()&" <|> digit
     return . Selector . T.unpack . T.strip . T.pack $ result
 
 comment :: Parser Entity

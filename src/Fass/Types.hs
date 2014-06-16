@@ -8,6 +8,7 @@ import Data.String
 import Data.List
 import Data.List.Split
 import qualified Data.Map as M
+import qualified Data.Text as T
 
 type Property = String
 type Value = String
@@ -21,7 +22,9 @@ instance Monoid Selector where
         | otherwise = Selector $ mungle x y
 
 mungle :: String -> String -> String
-mungle x y = intercalate ", " $ [ a ++ " " ++ b | a <- (splitOn "," x), b <- (splitOn "," y) ]
+mungle x y = intercalate ", " $ [ merge a b | a <- (splitOn "," x), b <- (splitOn "," y) ]
+             where merge a b | '&' `elem` b = T.unpack $ T.replace "&" (T.pack a) (T.pack b)
+                             | otherwise = a ++ " " ++ b
 
 instance IsString Selector where
     fromString x = Selector x
