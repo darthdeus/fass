@@ -4,6 +4,7 @@ module Fass.Compiler where
 import Control.Lens
 import Control.Monad.State
 import Data.Char (isSpace)
+import qualified Data.Text as T
 import Fass.Evaluator
 import Fass.Parser
 import Fass.Printer
@@ -25,8 +26,10 @@ compileEverything entities =
       inlined = flip evalState emptyEnv $ mapM inlineEntity entities
 
 compactSelector :: String -> String
-compactSelector s = rep " ]" "]" $ rep " +\\*= +" "*=" $ rep " += +" "=" s
+compactSelector s = T.unpack $ r " )" ")" $ r "( " "(" $ r " ]" "]" $
+                    T.pack $ rep " +" " " $ rep " +\\*= +" "*=" $ rep " += +" "=" s
   where
+    r = T.replace
     rep what with x = subRegex (mkRegex what) x with
 
 minify :: String -> String
