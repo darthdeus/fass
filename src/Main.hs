@@ -1,12 +1,13 @@
 module Main where
 
+import Control.Monad ((>=>))
 import System.Environment
 import Fass.Compiler
 
-main :: IO ()
+main :: IO [()]
 main = do
     as <- getArgs
-    if null as then
+    if null as || any (\a -> head a == '-') as then
       error "Usage: ./fass <file>"
     else
-      compileFile (head as) >>= putStrLn
+      mapM (compileFile >=> putStrLn) as
