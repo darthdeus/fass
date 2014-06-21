@@ -187,3 +187,9 @@ spec = do
 
         it "swallows single line comments" $ do
             testParser comment "// foo" `matchRight` Null
+
+
+    describe "import parser" $ do
+        it "parses simple imports" $ do
+            testParser importParser "@import \"foo.scss\"" `matchRight` Import "foo.scss"
+            testParser importParser "@import \"foo.scss\";" `matchRight` Import "foo.scss"
