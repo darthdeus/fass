@@ -55,6 +55,9 @@ variable = do
     optional $ char ';'
     return $ Variable name value
 
+importParser :: Parser Entity
+importParser = fmap Import $ string "@import \"" *> many1 (noneOf "\"") <* char '"' <* optional (char ';')
+
 propertyName :: Parser Property
 propertyName = many1 $ letter <|> oneOf "_-*"
 
