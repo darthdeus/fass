@@ -10,7 +10,7 @@ import Text.Parsec.String
 
 entity :: Parser Entity
 entity = do
-    value <- try comment <|> try variable <|> try rule <|> ruleset
+    value <- try comment <|> try importParser <|> try variable <|> try rule <|> ruleset
     spaces
     return value
 
