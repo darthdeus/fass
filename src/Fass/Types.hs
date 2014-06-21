@@ -33,6 +33,7 @@ data Ruleset = Ruleset Selector [Entity] deriving (Eq, Show)
 
 data Entity = Variable String String
             | Comment String
+            | Import FilePath
             | Rule String String
             | Nested Ruleset
             | Null
