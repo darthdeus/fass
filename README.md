@@ -8,10 +8,24 @@ to have complete compatibility with the [Ruby compiler](http://sass-lang.com).
 
 # Roadmap
 
+While there are test in the project, the main test suite comes from
+[sass-spec](https://github.com/sass/sass-spec). Currently the tests
+are only running the basic suite, which contains most of the SASS
+functionality.
+
+Current progress is 14/59 features implemented.
+
+## Feature list
+
 - ~~Compile simple SCSS to CSS~~
 - ~~Resolve nested rulesets in SCSS~~
-- ~~Variable expansion~~
-- Selector groups
-- Mixins
+- ~~Variables~~
+- ~~Selector groups~~
 - Imports
+- Hex arithmetic
+- Mixins
 - Functions
+- Media queries
+- Conditionals
+- Percentages
+- URLs
