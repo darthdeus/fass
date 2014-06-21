@@ -29,3 +29,9 @@ Current progress is 14/59 features implemented.
 - Conditionals
 - Percentages
 - URLs
+
+# Contributing
+
+Right now the main goal is to get up to speed with the reference SASS
+compiler. If you'd like to help out, the best thing you can do is pick
+a specific feature from the list of failing specs and implement it.
