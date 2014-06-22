@@ -11,7 +11,7 @@ spec :: Spec
 spec = describe "Compiler" $ do
     it "passes the sass-spec tests" $ do
         root <- getCurrentDirectory
-        let prefix = root </> "sass-spec" </> "spec" </> "basic"
+        let prefix = root </> "sass-spec"
         folders <- getDirectoryContents $ prefix
 
         let tests = folders \\ [".", ".."]
