@@ -5,7 +5,6 @@ import Fass.Compiler
 import System.Directory
 import System.FilePath.Posix
 import Test.Hspec
-import qualified Data.Text as T
 
 spec :: Spec
 spec = describe "Compiler" $ do
