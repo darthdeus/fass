@@ -1,3 +1,6 @@
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE NoMonomorphismRestriction #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Fass.Compiler
        ( compile
@@ -15,19 +18,36 @@ import           Fass.Printer
 import           Fass.Types
 import           Text.Regex
 
-compile :: String -> String
+compile :: String -> IO String
 compile input = case parseSCSS input of
     Left err -> fail $ show err
     Right result -> compileEverything result
 
-compileEverything :: [Entity] -> String
-compileEverything [] = ""
-compileEverything entities =
-    prettyPrint $ over (traverse._Nested._Ruleset._1._Selector) compactSelector $ concatMap (flatten "") $ inlined
+compileEverything :: [Entity] -> IO String
+compileEverything [] = return ""
+compileEverything entities = do
+    let inlined = flip evalState emptyEnv $ mapM inlineEntity entities
 
-    where
-      inlined :: [Entity]
-      inlined = flip evalState emptyEnv $ mapM inlineEntity entities
+    importsDone <- (traverse._Nested._Ruleset._2) (concatMapM inlineImportWithFile) inlined
+
+    let concatenated = concatMap (flatten "") $ importsDone
+    return . prettyPrint $ compactSelectors concatenated
+
+-- TODO - why does this need NoMonomorphismRestriction to work with no type
+compactSelectors :: forall (t :: * -> *). Traversable t => t Entity -> t Entity
+compactSelectors = over (traverse._Nested._Ruleset._1._Selector) compactSelector
+
+concatMapM :: (Monad f, Functor f) => (a -> f [b]) -> [a] -> f [b]
+concatMapM f xs = fmap concat (mapM f xs)
+
+inlineImportWithFile :: Entity -> IO [Entity]
+inlineImportWithFile (Import fileName) = do
+    content <- readFile fileName
+
+    case parseSCSS content of
+        Left err -> fail $ show err
+        Right result -> return result
+inlineImportWithFile x = return [x]
 
 compactSelector :: String -> String
 compactSelector s = T.unpack $ r " )" ")" $ r "( " "(" $ r " ]" "]" $
