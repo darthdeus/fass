@@ -148,7 +148,7 @@ spec = do
             testParser ruleset "p { color: red; }" `matchRight`
                 Nested (Ruleset "p" [Rule "color" "red"])
 
-            Testparser ruleset "p { background-color: #fff; }" `matchRight`
+            testParser ruleset "p { background-color: #fff; }" `matchRight`
                 Nested (Ruleset "p" [Rule "background-color" "#fff"])
 
         it "works for nested rulesets" $
