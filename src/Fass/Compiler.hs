@@ -39,7 +39,7 @@ compileEverything entities = do
 compactSelectors :: forall (t :: * -> *). Traversable t => t Entity -> t Entity
 compactSelectors = over (traverse._Nested._Ruleset._1._Selector) compactSelector
 
-concatMapM :: (Monad f, Functor f) => (a -> f [b]) -> [a] -> f [b]
+concatMapM :: (Monad m, Functor m) => (a -> m [b]) -> [a] -> m [b]
 concatMapM f xs = fmap concat (mapM f xs)
 
 inlineImportWithFile :: Entity -> IO [Entity]
