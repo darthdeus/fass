@@ -73,5 +73,6 @@ expandValue value = do
       variableValue env ('$':v) = maybe "" id $ M.lookup v env
       variableValue _ v = v
 
+-- TODO - document what this actually does
 unwrap :: [Entity] -> [Entity]
 unwrap = concatMap (flatten "")
