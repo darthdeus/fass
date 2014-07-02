@@ -45,7 +45,8 @@ inlineEntity :: Entity -> State SASSEnv Entity
 inlineEntity x = case x of
             Variable name value -> do
                 val <- expandValue value
-                modify (M.insert name val) >> return Null
+                modify (M.insert name val)
+                return Null
             Rule name value -> Rule name <$> expandValue value
             Nested ruleset -> do
                 current <- get
