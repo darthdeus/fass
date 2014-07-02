@@ -22,12 +22,16 @@ import           Text.Regex
 
 compile :: String -> IO String
 compile input = case parseSCSS input of
+    -- Handle the failure better
     Left err -> fail $ show err
     Right result -> compileEverything result
 
 compileEverything :: [Entity] -> IO String
 compileEverything [] = return ""
 compileEverything entities = do
+    -- TODO - the imports probably need to be resolved before resolving
+    -- variables, since new variables an be imported, or there can be dependencies
+    -- on the existing ones.
     let inlined = flip evalState emptyEnv $ mapM inlineEntity entities
 
     importsDone <- (traverse._Nested._Ruleset._2) (concatMapM inlineImportWithFile) inlined
@@ -47,8 +51,10 @@ inlineImportWithFile (Import fileName) = do
     content <- readFile fileName
 
     case parseSCSS content of
+        -- TODO - handle the failure here in a better way
         Left err -> fail $ show err
         Right result -> return result
+
 inlineImportWithFile x = return [x]
 
 compactSelector :: String -> String
