@@ -53,14 +53,25 @@ inlineEntity x = case x of
             Comment c -> return $ Comment c
             _ -> return Null
 
+-- Replaces all occurences of variables in a given String. Here are a few examples
+--
+--  $header-bg: #fafafa;
+--
+--  color: $header-bg;             -> color: #fafafa;
+--  border: 1px solid $header-bg;  -> border: 1px solid #fafafa;
+--
+-- It is important to note here, that the variable might only be a part of the property value,
+-- not just the simple case where the whole value is represented by a variable.
 expandValue :: String -> State SASSEnv String
 expandValue value = do
     env <- get
     return . unwords . map (variableValue env) $ words value
 
-variableValue :: SASSEnv -> String -> String
-variableValue env ('$':value) = maybe "" id $ M.lookup value env
-variableValue _ value = value
+    where
+      variableValue :: SASSEnv -> String -> String
+      -- TODO - better error handling in case the variable name is missgin
+      variableValue env ('$':v) = maybe "" id $ M.lookup v env
+      variableValue _ v = v
 
 unwrap :: [Entity] -> [Entity]
 unwrap = concatMap (flatten "")
