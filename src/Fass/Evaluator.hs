@@ -19,6 +19,24 @@ import Data.List
 emptyEnv :: SASSEnv
 emptyEnv = M.empty
 
+-- Flattens all nested entities inside a given entity with a given selector prefix.
+-- This comes handy when unwrapping the following structure
+--
+-- p {
+--   span { color: red; }
+-- }
+--
+-- When evaluating the nested `span`, this function would receive `p` as a prefix selector,
+-- which would then result in a `p span` selector when combined together.
+flatten :: Selector -> Entity -> [Entity]
+flatten prefix (Nested (Ruleset s entities)) = if null rules then unwrapped
+                                               else Nested (Ruleset (prefix <> s) rules) : unwrapped
+  where
+    (rules, nested) = partition (isn't _Nested) entities
+    unwrapped = concatMap (flatten (prefix <> s)) $ nested
+flatten _ Null = []
+flatten _ a = [a]
+
 inlineVariables :: Ruleset -> State SASSEnv Ruleset
 inlineVariables (Ruleset s []) = return $ Ruleset s []
 inlineVariables (Ruleset s entities) = mapM inlineEntity entities >>= return . Ruleset s
@@ -46,12 +64,3 @@ variableValue _ value = value
 
 unwrap :: [Entity] -> [Entity]
 unwrap = concatMap (flatten "")
-
-flatten :: Selector -> Entity -> [Entity]
-flatten prefix (Nested (Ruleset s entities)) = if null rules then unwrapped
-                                               else Nested (Ruleset (prefix <> s) rules) : unwrapped
-  where
-    (rules, nested) = partition (isn't _Nested) entities
-    unwrapped = concatMap (flatten (prefix <> s)) $ nested
-flatten _ Null = []
-flatten _ a = [a]
