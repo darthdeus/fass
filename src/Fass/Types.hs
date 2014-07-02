@@ -37,6 +37,10 @@ data Entity = Variable String String
             | Rule String String
             | Nested Ruleset
             | Null
+              -- ^ When doing some transformations on the AST, some Entities might get completely removed.
+              -- This might be the case of either variable inlining, comment removal or import resolution.
+              -- In such cases those Entities are replaced by the Null entity, which serves as a placeholder
+              -- and gets later removed by the Printer.
             deriving (Eq, Show)
 
 type SASSEnv = M.Map String String
