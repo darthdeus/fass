@@ -36,6 +36,8 @@ mungle x y = intercalate ", " $ [ merge a b | a <- (splitOn "," x), b <- (splitO
              where merge a b | '&' `elem` b = T.unpack $ T.replace "&" (T.pack a) (T.pack b)
                              | otherwise = a ++ " " ++ b
 
+-- While this isn't needed in the actual code, it's useful thing to have in tests.
+-- TODO - maybe only extract this in a test helper module?
 instance IsString Selector where
     fromString x = Selector x
 
@@ -47,10 +49,11 @@ data Entity = Variable String String
             | Rule String String
             | Nested Ruleset
             | Null
-              -- ^ When doing some transformations on the AST, some Entities might get completely removed.
-              -- This might be the case of either variable inlining, comment removal or import resolution.
-              -- In such cases those Entities are replaced by the Null entity, which serves as a placeholder
-              -- and gets later removed by the Printer.
+            -- ^ When doing some transformations on the AST, some Entities might get
+            -- completely removed.  This might be the case of either variable
+            -- inlining, comment removal or import resolution.  In such cases those
+            -- Entities are replaced by the Null entity, which serves as a
+            -- placeholder and gets later removed by the Printer.
             deriving (Eq, Show)
 
 type SASSEnv = M.Map String String
