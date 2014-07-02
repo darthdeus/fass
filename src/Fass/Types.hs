@@ -15,12 +15,22 @@ type Value = String
 
 newtype Selector = Selector String deriving (Show, Eq)
 
+-- Since selectors are often concatenated together, it only makes sense to have a Monoid
+-- instance encapsulating this behavior.
 instance Monoid Selector where
     mempty = Selector ""
     mappend (Selector x) (Selector y)
         | x == "" = Selector y
         | otherwise = Selector $ mungle x y
 
+-- Given two selectors (in String form) we need to merge them together in a way that
+-- makes sense for the SASS nesting rules. This is also the place where '&' gets resolved
+-- to the parent selector. Here are a few examples
+--
+-- "p" + "span" = "p span"
+-- "p, h1" + "span, code" = "p span, h1 span, p code, h1 code"
+-- "p" + "&:hover" = "p:hover"
+--
 mungle :: String -> String -> String
 mungle x y = intercalate ", " $ [ merge a b | a <- (splitOn "," x), b <- (splitOn "," y) ]
              where merge a b | '&' `elem` b = T.unpack $ T.replace "&" (T.pack a) (T.pack b)
