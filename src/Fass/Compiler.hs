@@ -5,6 +5,8 @@
 module Fass.Compiler
        ( compile
        , compileEverything
+       , minify
+       , trim
        ) where
 
 import           Control.Applicative
