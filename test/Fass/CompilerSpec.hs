@@ -20,7 +20,8 @@ spec = describe "Compiler" $ do
     it "works for simple variables" $ do
         let input = "$color: red;\na {\ncolor: $color;\n}"
 
-        compile input `shouldBe` "a {\n  color: red; }\n"
+        result <- compile input
+        result `shouldBe` "a {\n  color: red; }\n"
 
 runSpec :: FilePath -> IO ()
 runSpec prefix = do
@@ -34,7 +35,7 @@ runSpec prefix = do
     -- but there is one when there is more than one ruleset. I'm not 100%
     -- sure about this, which is why I'll be trimming them here in both cases.
 
-    let left = trim (compile input)
+    left <- fmap trim (compile input)
     let right = (trim expectedOutput)
 
     -- putStrLn $ left ++ "\n\n"
