@@ -40,8 +40,8 @@ spec = do
     describe "inline list" $ do
         it "works for nested elements" $ do
             let input = Ruleset "div" [Nested (Ruleset "img" [Rule "border" "0px"])]
-
-            inlineList [input] `shouldBe` [input]
+            let result = flip evalState emptyEnv $ inlineVariables input
+            result `shouldBe` input
 
     describe "flatten" $ do
         it "flattens nested rulesets" $ do
