@@ -49,7 +49,7 @@ inlineVariable env ('$':value) = maybe "" id $ M.lookup value env
 inlineVariable _ value = value
 
 unwrap :: [Entity] -> [Entity]
-unwrap entities = concatMap (flatten "") $ entities
+unwrap = concatMap (flatten "")
 
 flatten :: Selector -> Entity -> [Entity]
 flatten prefix (Nested (Ruleset s entities)) = if null rules then unwrapped
