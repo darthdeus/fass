@@ -9,7 +9,6 @@ module Fass.Compiler
        , trim
        ) where
 
-import           Control.Applicative
 import           Control.Lens
 import           Control.Monad.State
 import           Data.Char (isSpace)
