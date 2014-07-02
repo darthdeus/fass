@@ -1,5 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Fass.Evaluator where
+module Fass.Evaluator
+    ( inlineEntity
+    , inlineVariables
+    , inlineList
+    , emptyEnv
+    , unwrap
+    , flatten
+    ) where
 
 import Fass.Types
 
