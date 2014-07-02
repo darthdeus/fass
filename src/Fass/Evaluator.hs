@@ -42,11 +42,11 @@ inlineEntity x = case x of
 expandValue :: String -> State SASSEnv String
 expandValue value = do
     env <- get
-    return . unwords . map (inlineVariable env) $ words value
+    return . unwords . map (variableValue env) $ words value
 
-inlineVariable :: SASSEnv -> String -> String
-inlineVariable env ('$':value) = maybe "" id $ M.lookup value env
-inlineVariable _ value = value
+variableValue :: SASSEnv -> String -> String
+variableValue env ('$':value) = maybe "" id $ M.lookup value env
+variableValue _ value = value
 
 unwrap :: [Entity] -> [Entity]
 unwrap = concatMap (flatten "")
