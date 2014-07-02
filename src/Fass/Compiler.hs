@@ -1,15 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Fass.Compiler where
 
-import Control.Lens
-import Control.Monad.State
-import Data.Char (isSpace)
+import           Control.Applicative
+import           Control.Lens
+import           Control.Monad.State
+import           Data.Char (isSpace)
 import qualified Data.Text as T
-import Fass.Evaluator
-import Fass.Parser
-import Fass.Printer
-import Fass.Types
-import Text.Regex
+import           Fass.Evaluator
+import           Fass.Parser
+import           Fass.Printer
+import           Fass.Types
+import           Text.Regex
 
 compile :: String -> String
 compile input = case parseSCSS input of
