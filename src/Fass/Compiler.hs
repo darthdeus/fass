@@ -1,5 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Fass.Compiler where
+module Fass.Compiler
+       ( compile
+       , compileEverything
+       ) where
 
 import           Control.Applicative
 import           Control.Lens
