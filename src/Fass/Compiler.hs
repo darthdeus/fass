@@ -11,6 +11,7 @@ module Fass.Compiler
        , inlineImportWithFile
        ) where
 
+import           Control.Applicative
 import           Control.Lens
 import           Control.Monad.State
 import           Data.Char (isSpace)
@@ -34,7 +35,7 @@ parseAndResolve content = case parseSCSS content of
     Right result -> deepResolve result
 
 deepResolve :: [Entity] -> IO [Entity]
-deepResolve entities = fmap concat $ mapM inlineImportWithFile entities
+deepResolve entities = concat <$> mapM inlineImportWithFile entities
 
 inlineImportWithFile :: Entity -> IO [Entity]
 inlineImportWithFile (Import fileName) = readFile fileName >>= parseAndResolve
@@ -58,7 +59,7 @@ compactSelectors :: forall (t :: * -> *). Traversable t => t Entity -> t Entity
 compactSelectors = over (traverse._Nested._Ruleset._1._Selector) compactSelector
 
 concatMapM :: (Monad m, Functor m) => (a -> m [b]) -> [a] -> m [b]
-concatMapM f xs = fmap concat (mapM f xs)
+concatMapM f xs = concat <$> mapM f xs
 
 compactSelector :: String -> String
 compactSelector s = T.unpack $ r " )" ")" $ r "( " "(" $ r " ]" "]" $
