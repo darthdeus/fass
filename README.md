@@ -21,7 +21,7 @@ Current progress is 14/59 features implemented.
 - ~~Resolve nested rulesets in SCSS~~
 - ~~Variables~~
 - ~~Selector groups~~
-- Imports
+- ~~Imports~~
 - Hex arithmetic
 - Mixins
 - Functions
@@ -29,6 +29,20 @@ Current progress is 14/59 features implemented.
 - Conditionals
 - Percentages
 - URLs
+
+## Known issues
+
+Imports are now implemented to resolve recursively, which works in
+most cases, but can lead to an infinite loop when evaluating the
+following example:
+
+    // foo.scss
+    @import "bar.scss";
+
+    // bar.scss
+    @import "foo.scss";
+
+Basically any kind of circular imports will never terminate.
 
 # Contributing
 
