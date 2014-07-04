@@ -1,9 +1,12 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Fass.CompilerSpec where
 
 import Data.List
 import Fass.Compiler
+import Fass.Types
 import System.Directory
 import System.FilePath.Posix
+import System.IO
 import Test.Hspec
 
 spec :: Spec
@@ -22,6 +25,39 @@ spec = describe "Compiler" $ do
 
         result <- compile input
         result `shouldBe` "a {\n  color: red; }\n"
+
+    describe "inlineImportWithFile" $ do
+        it "is a noop for non-import entities" $ do
+            let input = Rule "foo" "bar"
+            inlineImportWithFile input >>= shouldBe [input]
+
+        it "impots a given file" $ do
+            let tmp = "/tmp/fass-test.scss"
+            withFile tmp WriteMode (\h -> hPutStrLn h "p { color: red; }")
+
+            result <- inlineImportWithFile (Import tmp)
+
+            -- in case the test fails, remove teh file first
+            removeFile tmp
+
+            result `shouldBe` [Nested (Ruleset "p" [Rule "color" "red"])]
+
+        it "resolves imports recursively" $ do
+            let tmp1 = "/tmp/fass-test1.scss"
+            let tmp2 = "/tmp/fass-test2.scss"
+
+            withFile tmp1 WriteMode
+                (\h -> hPutStrLn h "@import \"/tmp/fass-test2.scss\";")
+
+            withFile tmp2 WriteMode
+                (\h -> hPutStrLn h "p { color: red; }")
+
+            result <- inlineImportWithFile (Import tmp1)
+
+            removeFile tmp1
+            removeFile tmp2
+
+            result `shouldBe` [Nested (Ruleset "p" [Rule "color" "red"])]
 
 runSpec :: FilePath -> IO ()
 runSpec prefix = do
