@@ -6,6 +6,7 @@ module Fass.Compiler
        ( compile
        , compileEverything
        , minify
+       , deepResolve
        , trim
        , inlineImportWithFile
        ) where
@@ -26,6 +27,19 @@ compile input = case parseSCSS input of
     Left err -> fail $ show err
     Right result -> compileEverything result
 
+parseAndResolve :: String -> IO [Entity]
+parseAndResolve content = case parseSCSS content of
+    -- TODO - handle errors
+    Left err -> fail $ show err
+    Right result -> deepResolve result
+
+deepResolve :: [Entity] -> IO [Entity]
+deepResolve entities = fmap concat $ mapM inlineImportWithFile entities
+
+inlineImportWithFile :: Entity -> IO [Entity]
+inlineImportWithFile (Import fileName) = readFile fileName >>= parseAndResolve
+inlineImportWithFile x = return [x]
+
 compileEverything :: [Entity] -> IO String
 compileEverything [] = return ""
 compileEverything entities = do
@@ -45,16 +59,6 @@ compactSelectors = over (traverse._Nested._Ruleset._1._Selector) compactSelector
 
 concatMapM :: (Monad m, Functor m) => (a -> m [b]) -> [a] -> m [b]
 concatMapM f xs = fmap concat (mapM f xs)
-
-inlineImportWithFile :: Entity -> IO [Entity]
-inlineImportWithFile (Import fileName) = do
-    content <- readFile fileName
-
-    case parseSCSS content of
-        -- TODO - handle the failure here in a better way
-        Left err -> fail $ show err
-        Right result -> return result
-inlineImportWithFile x = return [x]
 
 compactSelector :: String -> String
 compactSelector s = T.unpack $ r " )" ")" $ r "( " "(" $ r " ]" "]" $
