@@ -52,7 +52,7 @@ spec = describe "Compiler" $ do
             withFile tmp2 WriteMode
                 (\h -> hPutStrLn h "p { color: red; }")
 
-            result <- inlineImportWithFile (Import tmp1)
+            result <- deepResolve [Import tmp1]
 
             removeFile tmp1
             removeFile tmp2
