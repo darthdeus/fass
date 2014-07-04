@@ -7,6 +7,7 @@ module Fass.Compiler
        , compileEverything
        , minify
        , trim
+       , inlineImportWithFile
        ) where
 
 import           Control.Lens
@@ -53,7 +54,6 @@ inlineImportWithFile (Import fileName) = do
         -- TODO - handle the failure here in a better way
         Left err -> fail $ show err
         Right result -> return result
-
 inlineImportWithFile x = return [x]
 
 compactSelector :: String -> String
