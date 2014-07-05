@@ -2,6 +2,8 @@
 module Fass.Arithmetic where
 
 import Data.Monoid
+import Data.List.Split
+import Numeric
 
 data Value = Hex Int
            | RGBA Int Int Int Float -- ^ rgb can be represented as rgba(_,_,_,1.0)
@@ -38,6 +40,31 @@ data Expr = Lit Value
           | OpMult Expr Expr
           | OpDiv Expr Expr
           deriving Show
+
+data Color = Color Int Int Int Float
+
+-- ^ Returns either a parsed color, or a string in case the parsing failed
+parseHex :: String -> Either String Color
+parseHex ('#':xs) =
+    case length xs of
+        -- 3 -> go . chunksOf 2 $ concatMap (\x -> [x,x]) xs
+        6 -> undefined -- parseHexTerms $ chunksOf 2 xs
+        otherwise -> Left xs
+
+
+parseHexTerms :: (String, String, String, String) -> Maybe (Int, Int, Int, Int)
+parseHexTerms (rs, gs, bs, as) = do
+    r <- parseSingle rs
+    g <- parseSingle gs
+    b <- parseSingle bs
+    a <- parseSingle as
+
+    return (r, g, b, a)
+
+parseSingle :: String -> Maybe Int
+parseSingle input = case readHex input of
+    [(n, "")] -> Just n
+    _ -> Nothing
 
 eval :: Expr -> Expr
 eval (OpPlus (Lit a) (Lit b)) = Lit $ a <> b
