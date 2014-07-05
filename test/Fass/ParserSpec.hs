@@ -157,6 +157,11 @@ spec = do
                         [Rule "color" "red",
                          Nested (Ruleset "span" [Rule "color" "#f0f0fa"])])
 
+        it "parses imports inside rulests" $ do
+            testParser ruleset "p { @import \"example.scss\"; }" `matchRight`
+                Nested (Ruleset "p" [Import "example.scss"])
+
+    describe "entityList parser" $ do
         it "works for simple nested elements" $ do
             testParser entityList "div {\n  img {\n    border: 0px;\n  }\n}" `matchRight`
                 [Nested (Ruleset "div"

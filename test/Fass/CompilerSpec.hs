@@ -1,11 +1,13 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Fass.CompilerSpec where
 
 import Data.List
 import Fass.Compiler
+import Fass.Types
 import System.Directory
 import System.FilePath.Posix
+import System.IO
 import Test.Hspec
-import qualified Data.Text as T
 
 spec :: Spec
 spec = describe "Compiler" $ do
@@ -21,7 +23,41 @@ spec = describe "Compiler" $ do
     it "works for simple variables" $ do
         let input = "$color: red;\na {\ncolor: $color;\n}"
 
-        compile input `shouldBe` "a {\n  color: red; }\n"
+        result <- compile input
+        result `shouldBe` "a {\n  color: red; }\n"
+
+    describe "inlineImportWithFile" $ do
+        it "is a noop for non-import entities" $ do
+            let input = Rule "foo" "bar"
+            inlineImportWithFile input >>= shouldBe [input]
+
+        it "impots a given file" $ do
+            let tmp = "/tmp/fass-test.scss"
+            withFile tmp WriteMode (\h -> hPutStrLn h "p { color: red; }")
+
+            result <- inlineImportWithFile (Import tmp)
+
+            -- in case the test fails, remove teh file first
+            removeFile tmp
+
+            result `shouldBe` [Nested (Ruleset "p" [Rule "color" "red"])]
+
+        it "resolves imports recursively" $ do
+            let tmp1 = "/tmp/fass-test1.scss"
+            let tmp2 = "/tmp/fass-test2.scss"
+
+            withFile tmp1 WriteMode
+                (\h -> hPutStrLn h "@import \"/tmp/fass-test2.scss\";")
+
+            withFile tmp2 WriteMode
+                (\h -> hPutStrLn h "p { color: red; }")
+
+            result <- deepResolve [Import tmp1]
+
+            removeFile tmp1
+            removeFile tmp2
+
+            result `shouldBe` [Nested (Ruleset "p" [Rule "color" "red"])]
 
 runSpec :: FilePath -> IO ()
 runSpec prefix = do
@@ -35,7 +71,7 @@ runSpec prefix = do
     -- but there is one when there is more than one ruleset. I'm not 100%
     -- sure about this, which is why I'll be trimming them here in both cases.
 
-    let left = trim (compile input)
+    left <- fmap trim (compile input)
     let right = (trim expectedOutput)
 
     -- putStrLn $ left ++ "\n\n"

@@ -5,10 +5,10 @@ import Fass.Compiler
 main :: IO ()
 main = do
     text <- readFile "sample.scss"
-    print $ compile text
+    compile text >>= print
 
 test :: IO ()
-test = readFile "sample.scss" >>= return . debugOutput >>= putStrLn
+test = readFile "sample.scss" >>= debugOutput >>= putStrLn
 
-debugOutput :: String -> String
+debugOutput :: String -> IO String
 debugOutput c = compile c

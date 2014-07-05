@@ -55,6 +55,7 @@ executable fass
                     , text
                     , lens
                     , filepath
+                    , split
                     , regex-compat == 0.95.1
 
   hs-source-dirs:     src

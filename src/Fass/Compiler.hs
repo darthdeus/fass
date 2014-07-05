@@ -1,29 +1,65 @@
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE NoMonomorphismRestriction #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Fass.Compiler where
+module Fass.Compiler
+       ( compile
+       , compileEverything
+       , minify
+       , deepResolve
+       , trim
+       , inlineImportWithFile
+       ) where
 
-import Control.Lens
-import Control.Monad.State
-import Data.Char (isSpace)
+import           Control.Applicative
+import           Control.Lens
+import           Control.Monad.State
+import           Data.Char (isSpace)
 import qualified Data.Text as T
-import Fass.Evaluator
-import Fass.Parser
-import Fass.Printer
-import Fass.Types
-import Text.Regex
+import           Fass.Evaluator
+import           Fass.Parser
+import           Fass.Printer
+import           Fass.Types
+import           Text.Regex
 
-compile :: String -> String
+compile :: String -> IO String
 compile input = case parseSCSS input of
+    -- Handle the failure better
     Left err -> fail $ show err
     Right result -> compileEverything result
 
-compileEverything :: [Entity] -> String
-compileEverything [] = ""
-compileEverything entities =
-    prettyPrint $ over (traverse._Nested._Ruleset._1._Selector) compactSelector $ concatMap (flatten "") $ inlined
+parseAndResolve :: String -> IO [Entity]
+parseAndResolve content = case parseSCSS content of
+    -- TODO - handle errors
+    Left err -> fail $ show err
+    Right result -> deepResolve result
 
-    where
-      inlined :: [Entity]
-      inlined = flip evalState emptyEnv $ mapM inlineEntity entities
+deepResolve :: [Entity] -> IO [Entity]
+deepResolve entities = concat <$> mapM inlineImportWithFile entities
+
+inlineImportWithFile :: Entity -> IO [Entity]
+inlineImportWithFile (Import fileName) = readFile fileName >>= parseAndResolve
+inlineImportWithFile x = return [x]
+
+compileEverything :: [Entity] -> IO String
+compileEverything [] = return ""
+compileEverything entities = do
+    -- TODO - the imports probably need to be resolved before resolving
+    -- variables, since new variables an be imported, or there can be dependencies
+    -- on the existing ones.
+    let inlined = flip evalState emptyEnv $ mapM inlineEntity entities
+
+    importsDone <- (traverse._Nested._Ruleset._2) (concatMapM inlineImportWithFile) inlined
+
+    let concatenated = concatMap (flatten "") $ importsDone
+    return . prettyPrint $ compactSelectors concatenated
+
+-- TODO - why does this need NoMonomorphismRestriction to work with no type
+compactSelectors :: forall (t :: * -> *). Traversable t => t Entity -> t Entity
+compactSelectors = over (traverse._Nested._Ruleset._1._Selector) compactSelector
+
+concatMapM :: (Monad m, Functor m) => (a -> m [b]) -> [a] -> m [b]
+concatMapM f xs = concat <$> mapM f xs
 
 compactSelector :: String -> String
 compactSelector s = T.unpack $ r " )" ")" $ r "( " "(" $ r " ]" "]" $
