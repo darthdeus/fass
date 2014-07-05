@@ -2,6 +2,7 @@ module Fass.Parser.Color where
 
 import Control.Monad (void)
 import Control.Applicative ((<$>))
+import Data.Char
 import Text.Parsec
 import Text.Parsec.String
 
@@ -53,3 +54,18 @@ rgba = do
     optional $ char ';'
 
     return $ RGBA r g b a
+
+hexColorShort :: Parser String
+hexColorShort = do
+    void $ char '#'
+    count 3 hexDigit
+    -- TODO - force a space at the end
+
+hexColorLong :: Parser String
+hexColorLong = do
+    void $ char '#'
+    count 6 hexDigit
+    -- TODO - force a space at the end
+
+hexColorString :: Parser String
+hexColorString = hexColorLong <|> hexColorShort
