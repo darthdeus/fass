@@ -4,6 +4,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Fass.Compiler
        ( compile
+       , compileFile
        , compileEverything
        , minify
        , deepResolve
@@ -20,31 +21,50 @@ import           Fass.Evaluator
 import           Fass.Parser
 import           Fass.Printer
 import           Fass.Types
+import           System.Directory
+import           System.FilePath.Posix
 import           Text.Regex
+
+compileFile :: FilePath -> IO String
+compileFile path = do
+    content <- readFile path
+
+    case parseSCSS content of
+        Left err -> fail $ show err
+        Right result -> compileEverything result $ takeDirectory path
 
 compile :: String -> IO String
 compile input = case parseSCSS input of
     -- Handle the failure better
     Left err -> fail $ show err
-    Right result -> compileEverything result
+    Right result -> getCurrentDirectory >>= compileEverything result
 
-parseAndResolve :: String -> IO [Entity]
-parseAndResolve content = case parseSCSS content of
+parseAndResolve :: FilePath -> String -> IO [Entity]
+parseAndResolve baseDir content = case parseSCSS content of
     -- TODO - handle errors
     Left err -> fail $ show err
-    Right result -> deepResolve result
+    Right result -> deepResolve baseDir result
 
-deepResolve :: [Entity] -> IO [Entity]
-deepResolve entities = concat <$> mapM inlineImportWithFile entities
+-- TODO - run all of the import computations inside a Reader with the path
+deepResolve :: FilePath -> [Entity] -> IO [Entity]
+deepResolve baseDir entities = concat <$> mapM (inlineImportWithFile baseDir) entities
 
-inlineImportWithFile :: Entity -> IO [Entity]
-inlineImportWithFile (Import fileName) = readFile fileName >>= parseAndResolve
-inlineImportWithFile x = return [x]
+inlineImportWithFile :: FilePath -> Entity -> IO [Entity]
+inlineImportWithFile baseDir (Import fileName) = do
+    file <- readFile (baseDir </> fileName)
+    parseAndResolve baseDir file
 
-compileEverything :: [Entity] -> IO String
-compileEverything [] = return ""
-compileEverything entities = do
-    importsDone <- (traverse._Nested._Ruleset._2) (concatMapM inlineImportWithFile) entities
+inlineImportWithFile baseDir (Nested (Ruleset s entities)) = do
+    result <- concatMapM (inlineImportWithFile baseDir) entities
+    return $ [Nested $ Ruleset s result]
+
+inlineImportWithFile _ x = return [x]
+
+compileEverything :: [Entity] -> FilePath -> IO String
+compileEverything [] _ = return ""
+compileEverything entities path = do
+    importsDone <- concatMapM (inlineImportWithFile path) entities
+
     let inlined = flip evalState emptyEnv $ mapM inlineEntity importsDone
 
     let concatenated = concatMap (flatten "") $ inlined
