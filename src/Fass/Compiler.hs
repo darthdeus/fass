@@ -44,14 +44,10 @@ inlineImportWithFile x = return [x]
 compileEverything :: [Entity] -> IO String
 compileEverything [] = return ""
 compileEverything entities = do
-    -- TODO - the imports probably need to be resolved before resolving
-    -- variables, since new variables an be imported, or there can be dependencies
-    -- on the existing ones.
-    let inlined = flip evalState emptyEnv $ mapM inlineEntity entities
+    importsDone <- (traverse._Nested._Ruleset._2) (concatMapM inlineImportWithFile) entities
+    let inlined = flip evalState emptyEnv $ mapM inlineEntity importsDone
 
-    importsDone <- (traverse._Nested._Ruleset._2) (concatMapM inlineImportWithFile) inlined
-
-    let concatenated = concatMap (flatten "") $ importsDone
+    let concatenated = concatMap (flatten "") $ inlined
     return . prettyPrint $ compactSelectors concatenated
 
 -- TODO - why does this need NoMonomorphismRestriction to work with no type
