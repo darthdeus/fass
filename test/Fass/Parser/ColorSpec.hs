@@ -16,17 +16,7 @@ matchRight ex y = case ex of
 
 spec :: Spec
 spec = do
-    describe "hexColorShort" $ do
-        it "works for a simple hex color" $ do
-            testParser hexColorShort "#fff" `matchRight` "fff"
-            testParser hexColorShort "#123" `matchRight` "123"
-
-    describe "hexColorLong" $ do
-        it "works for a simple hex color" $ do
-            testParser hexColorLong "#ffffff" `matchRight` "ffffff"
-            testParser hexColorLong "#fafafa" `matchRight` "fafafa"
-
     describe "parseColor" $ do
         it "works for both short and long hex colors" $ do
-            testParser hexColor "#ffffff" `matchRight` Hex "ffffff"
-            testParser hexColor "#fff" `matchRight` Hex "ffffff"
+            testParser hexColor "#ffffff" `matchRight` RGB 255 255 255
+            testParser hexColor "#fff" `matchRight` RGB 255 255 255
