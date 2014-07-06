@@ -2,7 +2,6 @@ module Fass.Parser.Color where
 
 import Control.Monad (void)
 import Control.Applicative ((<$>))
-import Data.Char
 import Text.Parsec
 import Text.Parsec.String
 
