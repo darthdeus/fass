@@ -5,8 +5,9 @@ import Control.Applicative ((<$>))
 import Text.Parsec
 import Text.Parsec.String
 
-data RGB = RGB Int Int Int
-data RGBA = RGBA Int Int Int Float
+data RGBA = RGBA Int Int Int Float deriving (Show, Eq)
+data RGB  = RGB Int Int Int deriving (Show, Eq)
+data Hex  = Hex String deriving (Show, Eq)
 
 -- TODO - remove duplication with Fass.Parser
 paddedChar :: Char -> Parser ()
@@ -68,3 +69,12 @@ hexColorLong = do
 
 hexColorString :: Parser String
 hexColorString = try hexColorLong <|> hexColorShort
+
+hexColor :: Parser Hex
+hexColor = do
+    str <- hexColorString
+    return $ Hex (normalizeColor str)
+
+    where normalizeColor xs = if length xs == 3
+                              then concatMap (\x -> [x,x]) xs
+                              else xs
