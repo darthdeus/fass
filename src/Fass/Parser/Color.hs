@@ -1,13 +1,21 @@
-module Fass.Parser.Color where
+module Fass.Parser.Color
+       ( RGBA(..)
+       , RGB(..)
+       , rgb
+       , rgba
+       , hexColor
+       ) where
 
 import Control.Monad (void)
 import Control.Applicative ((<$>))
+import Data.List.Split
+import Data.Maybe
+import Numeric
 import Text.Parsec
 import Text.Parsec.String
 
 data RGBA = RGBA Int Int Int Float deriving (Show, Eq)
 data RGB  = RGB Int Int Int deriving (Show, Eq)
-data Hex  = Hex String deriving (Show, Eq)
 
 -- TODO - remove duplication with Fass.Parser
 paddedChar :: Char -> Parser ()
@@ -55,26 +63,33 @@ rgba = do
 
     return $ RGBA r g b a
 
-hexColorShort :: Parser String
+hexColor :: Parser RGB
+hexColor = try hexColorLong <|> hexColorShort
+
+hexColorShort :: Parser RGB
 hexColorShort = do
     void $ char '#'
-    count 3 hexDigit
-    -- TODO - force a space at the end
+    digits <- count 3 hexDigit
 
-hexColorLong :: Parser String
+    return $ unsafeParseHexIntoRGB $ concatMap (\x -> [x,x]) digits
+
+hexColorLong :: Parser RGB
 hexColorLong = do
     void $ char '#'
-    count 6 hexDigit
+    unsafeParseHexIntoRGB <$> count 6 hexDigit
     -- TODO - force a space at the end
 
-hexColorString :: Parser String
-hexColorString = try hexColorLong <|> hexColorShort
+-- The string MUST be 6 character valid hex number. The only place to call
+-- this function is from the hex parser.
+unsafeParseHexIntoRGB :: String -> RGB
+unsafeParseHexIntoRGB xs = RGB r g b
+    where [r,g,b] = map unsafeParseSingle $ chunksOf 2 xs
 
-hexColor :: Parser Hex
-hexColor = do
-    str <- hexColorString
-    return $ Hex (normalizeColor str)
+parseSingle :: String -> Maybe Int
+parseSingle input = case readHex input of
+    [(n, "")] -> Just n
+    _ -> Nothing
 
-    where normalizeColor xs = if length xs == 3
-                              then concatMap (\x -> [x,x]) xs
-                              else xs
+-- Only call this on a previously verified valid hex number.
+unsafeParseSingle :: String -> Int
+unsafeParseSingle input = fromMaybe undefined (parseSingle input)
