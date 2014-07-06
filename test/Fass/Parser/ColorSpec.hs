@@ -25,3 +25,8 @@ spec = do
         it "works for a simple hex color" $ do
             testParser hexColorLong "#ffffff" `matchRight` "ffffff"
             testParser hexColorLong "#fafafa" `matchRight` "fafafa"
+
+    describe "hexColorString" $ do
+        it "works for both short and long hex colors" $ do
+            testParser hexColorString "#ffffff" `matchRight` "ffffff"
+            testParser hexColorString "#fff" `matchRight` "fff"
