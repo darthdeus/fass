@@ -67,4 +67,4 @@ hexColorLong = do
     -- TODO - force a space at the end
 
 hexColorString :: Parser String
-hexColorString = hexColorLong <|> hexColorShort
+hexColorString = try hexColorLong <|> hexColorShort
