@@ -35,7 +35,7 @@ compileFile path = do
 
 compile :: String -> IO String
 compile input = case parseSCSS input of
-    -- Handle the failure better
+    -- TODO - handle errors
     Left err -> fail $ show err
     Right result -> getCurrentDirectory >>= compileEverything result
 
