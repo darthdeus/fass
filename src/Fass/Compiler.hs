@@ -85,10 +85,7 @@ compactSelector s = T.unpack $ r " )" ")" $ r "( " "(" $ r " ]" "]" $
     rep what with x = subRegex (mkRegex what) x with
 
 minify :: String -> String
-minify css =
-    trim
-    $ collapseSpace
-    $ newlines css
+minify = trim . collapseSpace . newlines
 
 trim :: String -> String
 trim = f . f where f = reverse . dropWhile isSpace
