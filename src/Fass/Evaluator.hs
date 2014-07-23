@@ -29,8 +29,9 @@ emptyEnv = M.empty
 -- When evaluating the nested `span`, this function would receive `p` as a prefix selector,
 -- which would then result in a `p span` selector when combined together.
 flatten :: Selector -> Entity -> [Entity]
-flatten prefix (Nested (Ruleset s entities)) = if null rules then unwrapped
-                                               else Nested (Ruleset (prefix <> s) rules) : unwrapped
+flatten prefix (Nested (Ruleset s entities)) =
+    if null rules then unwrapped
+    else Nested (Ruleset (prefix <> s) rules) : unwrapped
   where
     (rules, nested) = partition (isn't _Nested) entities
     unwrapped = concatMap (flatten (prefix <> s)) $ nested
