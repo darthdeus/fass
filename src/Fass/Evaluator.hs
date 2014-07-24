@@ -71,7 +71,7 @@ expandValue value = do
 
     where
       variableValue :: SASSEnv -> String -> String
-      -- TODO - better error handling in case the variable name is missgin
+      -- TODO - better error handling in case the variable name is missing
       variableValue env ('$':v) = maybe "" id $ M.lookup v env
       variableValue _ v = v
 
