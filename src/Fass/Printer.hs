@@ -14,7 +14,6 @@ printEntity i (Nested (Ruleset (Selector s) rules)) = padded i $ s ++ " {\n" ++ 
   where
     printedRules :: [Entity] -> String
     printedRules xs = intercalate "\n" $ toListOf (traverse._Just) $ map (printEntity (i + 2)) xs
-
 printEntity _ _ = fail "Invalid input"
 
 padded :: Int -> String -> Maybe String
