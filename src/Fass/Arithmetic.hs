@@ -1,4 +1,5 @@
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE StandaloneDeriving #-}
 module Fass.Arithmetic where
 
@@ -9,17 +10,14 @@ data Value = RGBA Int Int Int Float -- ^ rgb can be represented as rgba(_,_,_,1.
            | Literal String
            deriving Show
 
--- This is not to be confused with a `Show` instance, as this is not for
--- debugging purposes, but rather for compiling the value down for concatenation
--- which can't be done in any other way, such as "#abc + hello".
-stringRep :: Value -> String
-stringRep (Literal s) = s
-stringRep (Number x) = show x
-stringRep (RGBA r g b a) = if a == 1.0
-                           then "rgb(" ++ show r ++ "," ++ show g ++
-                                "," ++ show b ++ ")"
-                           else "rgba(" ++ show r ++ "," ++ show g ++
-                                "," ++ show b ++ "," ++ show a ++ ")"
+class Div a where
+    divide :: a -> a -> a
+
+instance Div Int where
+    divide = div
+
+instance Div Float where
+    divide = (/)
 
 data Expr a where
     Lit :: Value -> Expr Value
@@ -29,6 +27,9 @@ data Expr a where
     Div :: Expr a -> Expr a -> Expr a
 
 deriving instance Show (Expr a)
+
+runLit :: Expr Value -> Value
+runLit (Lit x) = x
 
 instance Monoid Value where
     mempty = Literal ""
@@ -41,12 +42,35 @@ instance Monoid Value where
 
 data Color = Color Int Int Int Float
 
-op :: Expr Value -> Expr Value -> Expr Value
-op = undefined
+op :: (forall a. (Div a, Num a) => a -> a -> a) -> Value -> Value -> Value
+op f (RGBA r1 g1 b1 a1) (RGBA r2 g2 b2 a2) = RGBA (r1 `f` r2) (g1 `f` g2) (b1 `f` b2) (a1 `f` a2) -- TODO add missing modulos
+op f (Number x1) (Number x2) = Number (x1 `f` x2)
+
+
+opPlus, opMinus, opMult, opDiv :: Value -> Value -> Value
+opPlus  = op (+)
+opMinus = op (-)
+opMult  = op (*)
+opDiv   = op divide
 
 eval :: Expr a -> Expr Value
-eval (Plus x y)  = eval x `op` eval y
-eval (Minus x y) = eval x `op` eval y
-eval (Mult x y)  = eval x `op` eval y
-eval (Div x y)   = eval x `op` eval y
+eval (Plus x y)  = Lit $ runEval x `opPlus` runEval y
+eval (Minus x y) = Lit $ runEval x `opMinus` runEval y
+eval (Mult x y)  = Lit $ runEval x `opMult` runEval y
+eval (Div x y)   = Lit $ runEval x `opDiv` runEval y
 eval (Lit x)     = Lit x
+
+runEval :: Expr a -> Value
+runEval = runLit . eval
+
+-- This is not to be confused with a `Show` instance, as this is not for
+-- debugging purposes, but rather for compiling the value down for concatenation
+-- which can't be done in any other way, such as "#abc + hello".
+stringRep :: Value -> String
+stringRep (Literal s) = s
+stringRep (Number x) = show x
+stringRep (RGBA r g b a) = if a == 1.0
+                           then "rgb(" ++ show r ++ "," ++ show g ++
+                                "," ++ show b ++ ")"
+                           else "rgba(" ++ show r ++ "," ++ show g ++
+                                "," ++ show b ++ "," ++ show a ++ ")"
