@@ -44,11 +44,21 @@ spec = do
             testParser rule "color: red" `matchRight` Rule "color" "red"
             testParser rule "color: red;" `matchRight` Rule "color" "red"
 
+        it "allows numbers in rule names" $
+            testParser rule "p01: red;" `matchRight` Rule "p01" "red"
+
         it "works for rules with variables in them" $
             testParser rule "color: $header-bg" `matchRight` Rule "color" "$header-bg"
 
         it "works for functions" $
             testParser rule "color: rgba(255, 255, 0)" `matchRight` Rule "color" "rgba(255, 255, 0)"
+
+        it "works for hexadecimal numbers" $
+            testParser rule "color: #fafafa" `matchRight` Rule "color" "#fafafa"
+
+        it "works for basic arithmetic" $ do
+            testParser rule "color: #fafafa + hello" `matchRight` Rule "color" "#fafafa + hello"
+            testParser rule "color: #fafafa + #bbb" `matchRight` Rule "color" "#fafafa + #bbb"
 
     describe "variable parser" $ do
         it "works for integers" $

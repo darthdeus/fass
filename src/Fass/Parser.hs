@@ -59,7 +59,7 @@ importParser :: Parser Entity
 importParser = fmap Import $ string "@import \"" *> many1 (noneOf "\"") <* char '"' <* optional (char ';')
 
 propertyName :: Parser Property
-propertyName = many1 $ letter <|> oneOf "_-*"
+propertyName = many1 $ letter <|> oneOf "_-*" <|> digit -- TODO - shouldn't accept digit as first character
 
 propertyValue :: Parser Value
 propertyValue = many1 $ noneOf ";"
