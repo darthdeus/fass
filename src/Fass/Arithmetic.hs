@@ -35,15 +35,6 @@ deriving instance Show (Expr a)
 runLit :: Expr Value -> Value
 runLit (Lit x) = x
 
-instance Monoid Value where
-    mempty = Literal ""
-
-    mappend (Number x) (Number y) = Number (x + y)
-    mappend (RGBA r1 g1 b1 a1) (RGBA r2 g2 b2 a2) =
-        RGBA (r1 + r2) (g1 + g2) (b1 + b2) (a1 + a2)
-    mappend (Literal x) (Literal y) = Literal $ x ++ y
-    mappend x y = Literal $ stringRep x ++ stringRep y
-
 data Color = Color Int Int Int Float
 
 op :: (forall a. (Div a, Num a) => a -> a -> a) -> Value -> Value -> Value
