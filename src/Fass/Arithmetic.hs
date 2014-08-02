@@ -10,6 +10,8 @@ data Value = RGBA Int Int Int Float -- ^ rgb can be represented as rgba(_,_,_,1.
            | Literal String
            deriving Show
 
+-- Small abstraction to be able to have one function doing division
+-- on both Ints and Floats
 class Div a where
     divide :: a -> a -> a
 
@@ -19,12 +21,14 @@ instance Div Int where
 instance Div Float where
     divide = (/)
 
+data Term
+
 data Expr a where
-    Lit :: Value -> Expr Value
-    Plus :: Expr a -> Expr a -> Expr a
-    Minus :: Expr a -> Expr a -> Expr a
-    Mult :: Expr a -> Expr a -> Expr a
-    Div :: Expr a -> Expr a -> Expr a
+    Lit   :: Value -> Expr Value
+    Plus  :: Expr a -> Expr a -> Expr Term
+    Minus :: Expr a -> Expr a -> Expr Term
+    Mult  :: Expr a -> Expr a -> Expr Term
+    Div   :: Expr a -> Expr a -> Expr Term
 
 deriving instance Show (Expr a)
 
