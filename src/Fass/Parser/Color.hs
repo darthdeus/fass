@@ -66,8 +66,8 @@ rgba = do
 
     return $ RGBA r g b a
 
-hexColor :: Parser RGB
-hexColor = try hexColorLong <|> hexColorShort
+hexColor :: Parser RGBA
+hexColor = fmap convertRGB $ try hexColorLong <|> hexColorShort
 
 hexColorShort :: Parser RGB
 hexColorShort = do
