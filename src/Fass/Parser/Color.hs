@@ -1,8 +1,5 @@
 module Fass.Parser.Color
        ( RGBA(..)
-       , RGB(..)
-       , rgb
-       , rgba
        , colorParser
        ) where
 
