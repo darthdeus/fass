@@ -18,7 +18,7 @@ convertRGB :: RGB -> RGBA
 convertRGB (RGB r g b) = RGBA r g b 0.0
 
 colorParser :: Parser RGBA
-colorParser = try (convertRGB <$> rgb) <|> rgba
+colorParser = try hexColor <|> try (convertRGB <$> rgb) <|> rgba
 
 -- TODO - remove duplication with Fass.Parser
 paddedChar :: Char -> Parser ()
