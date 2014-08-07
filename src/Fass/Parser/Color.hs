@@ -1,9 +1,11 @@
+{-# LANGUAGE GADTs #-}
 module Fass.Parser.Color
        ( RGBA(..)
        , RGB(..)
        , rgb
        , rgba
        , hexColor
+       , colorParser
        ) where
 
 import Control.Monad (void)
@@ -16,6 +18,12 @@ import Text.Parsec.String
 
 data RGBA = RGBA Int Int Int Float deriving (Show, Eq)
 data RGB  = RGB Int Int Int deriving (Show, Eq)
+
+convertRGB :: RGB -> RGBA
+convertRGB (RGB r g b) = RGBA r g b 0.0
+
+colorParser :: Parser RGBA
+colorParser = try (convertRGB <$> rgb) <|> rgba
 
 -- TODO - remove duplication with Fass.Parser
 paddedChar :: Char -> Parser ()
