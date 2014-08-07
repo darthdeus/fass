@@ -4,7 +4,6 @@ module Fass.Parser.Color
        , RGB(..)
        , rgb
        , rgba
-       , hexColor
        , colorParser
        ) where
 
