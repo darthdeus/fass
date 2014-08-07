@@ -12,6 +12,8 @@ matchRight ex y = case ex of
     Left x -> fail $ show x
     Right x -> x `shouldBe` y
 
-
 testParserEqual :: Parser String -> String -> IO ()
 testParserEqual parser input = testParser parser input `matchRight` input
+
+(|@|) :: (Eq a, Show a) => a -> a -> Expectation
+(|@|) = shouldBe
