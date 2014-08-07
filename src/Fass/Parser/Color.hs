@@ -1,4 +1,3 @@
-{-# LANGUAGE GADTs #-}
 module Fass.Parser.Color
        ( RGBA(..)
        , RGB(..)
