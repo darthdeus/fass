@@ -11,4 +11,4 @@ spec :: Spec
 spec = do
     describe "SCSS parser" $
         it "parses simple CSS" $
-            parseSCSS "p { color: #fff; }" `matchRight` [Nested (Ruleset "p" [Rule "color" "#fff"])]
+            parseSCSS "p { color: #fff; }" |@| [Nested (Ruleset "p" [Rule "color" "#fff"])]
