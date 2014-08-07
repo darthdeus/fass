@@ -5,7 +5,6 @@ import Fass.TestHelper
 
 import Test.Hspec
 
--- TODO - extract shared logic into something like TestHelper
 spec :: Spec
 spec = do
     describe "colorParser" $ do
