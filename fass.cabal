@@ -57,6 +57,7 @@ executable fass
                     , containers
                     , fass
                     , text
+                    , directory
                     , lens
                     , filepath
                     , split
