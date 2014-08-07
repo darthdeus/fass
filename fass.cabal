@@ -35,6 +35,10 @@ library
                     , Fass.Evaluator
                     , Fass.Printer
                     , Fass.Parser
+                    , Fass.Parser.Color
+                    , Fass.Parser.Entity
+                    , Fass.Parser.Helper
+                    , Fass.Parser.Value
                     , Fass.Types
 
   other-modules:
