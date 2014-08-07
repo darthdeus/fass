@@ -5,29 +5,14 @@ import Control.Monad
 import Fass
 import Fass.Parser
 import Fass.Types
+import Fass.TestHelper
+
 import Test.Hspec
 import Test.Hspec.Formatters
 import Test.Hspec.Runner
-import Text.Parsec.Prim
-import Text.Parsec.String
-import Text.Parsec.Error
-
-testParser :: Parser a -> String -> Either ParseError a
-testParser parser = parse parser "test parser"
-
-matchRight :: (Show a, Show b, Eq b) => Either a b -> b -> IO ()
-matchRight ex y = case ex of
-    Left x -> fail $ show x
-    Right x -> x `shouldBe` y
-
-testParserEqual :: Parser String -> String -> IO ()
-testParserEqual parser input = testParser parser input `matchRight` input
 
 testSelector :: String -> IO ()
 testSelector string = testParser selector string `matchRight` Selector string
-
--- let errorToString = either (Left . show) Right
--- let per = errorToString . parseSCSS
 
 main :: IO ()
 main = void $ hspecWith (defaultConfig { configFormatter = progress }) spec
