@@ -1,9 +1,10 @@
 module Fass.Parser where
 
+import Fass.Types
+import Fass.Parser.Helper
+
 import Control.Applicative ((*>), (<*), (<$>))
 import Control.Monad
-import Fass.Types
-
 import qualified Data.Text as T
 import Text.Parsec
 import Text.Parsec.String
@@ -13,9 +14,6 @@ entity = do
     value <- try comment <|> try importParser <|> try variable <|> try rule <|> ruleset
     spaces
     return value
-
-paddedChar :: Char -> Parser ()
-paddedChar c = void $ spaces >> char c >> spaces
 
 ruleset :: Parser Entity
 ruleset = do

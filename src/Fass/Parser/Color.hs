@@ -3,6 +3,8 @@ module Fass.Parser.Color
        , colorParser
        ) where
 
+import Fass.Parser.Helper
+
 import Control.Monad (void)
 import Control.Applicative ((<$>))
 import Data.List.Split
@@ -19,10 +21,6 @@ convertRGB (RGB r g b) = RGBA r g b 0.0
 
 colorParser :: Parser RGBA
 colorParser = try hexColor <|> try (convertRGB <$> rgb) <|> rgba
-
--- TODO - remove duplication with Fass.Parser
-paddedChar :: Char -> Parser ()
-paddedChar c = void $ spaces >> char c >> spaces
 
 number :: Parser Int
 number = read <$> many1 digit
