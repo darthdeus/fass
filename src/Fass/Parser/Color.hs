@@ -22,18 +22,6 @@ convertRGB (RGB r g b) = RGBA r g b 0
 colorParser :: Parser RGBA
 colorParser = try hexColor <|> try (convertRGB <$> rgb) <|> rgba
 
-number :: Parser Int
-number = read <$> many1 digit
-
--- TODO - find a better way to express this
-float :: Parser Float
-float = do
-    before <- many1 digit
-    void $ char '.'
-    after <- many1 digit
-
-    return $ read $ before ++ "." ++ after
-
 rgb :: Parser RGB
 rgb = do
     void $ string "rgb("
